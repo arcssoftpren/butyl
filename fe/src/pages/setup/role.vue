@@ -5,72 +5,93 @@
       max-height="60vh"
       :search="search"
       :items="roles"
+      :items-per-page-options="[]"
+      items-per-page="4"
     >
       <template #top>
         <v-toolbar color="transparent">
-          <template #title>Roles List</template>
-          <template #extension>
-            <v-toolbar color="transparent">
-              <template #title>
-                <v-text-field
-                  class="mt-2"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
-                  rounded="pill"
-                  label="Search"
-                  hide-details
-                  density="compact"
-                  v-model="search"
-                />
-              </template>
-              <template #append>
-                <v-btn
-                  @click="openDialog"
-                  density="compact"
-                  variant="outlined"
-                  icon
-                  class="mt-2 ms-2"
-                >
-                  <v-icon>mdi-plus</v-icon>
-                </v-btn>
-              </template>
-            </v-toolbar>
+          <template #title>
+            <v-text-field
+              class="mt-2"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
+              rounded="pill"
+              label="Search"
+              hide-details
+              density="compact"
+              v-model="search"
+            />
+          </template>
+          <template #append>
+            <v-btn
+              @click="openDialog"
+              density="compact"
+              variant="outlined"
+              icon
+              class="mt-2 ms-2"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
           </template>
         </v-toolbar>
         <v-divider class="my-2"></v-divider>
       </template>
       <template #headers>
         <tr class="text-uppercase">
-          <th>#</th>
-          <th>Role Name</th>
-          <th>Home Page</th>
-          <th>Access Rights</th>
-          <th class="text-center">Actions</th>
+          <th rowspan="2">#</th>
+          <th rowspan="2">Role Name</th>
+          <th rowspan="2">Home Page</th>
+          <!-- <th colspan="2">Access Rights</th> -->
+          <th rowspan="2" class="text-center">Actions</th>
         </tr>
+        <!-- <tr>
+          <th>Setups</th>
+          <th>Menus</th>
+        </tr> -->
       </template>
       <template #item="{ item, index }">
         <tr class="text-uppercase">
-          <td>{{ index }}</td>
-          <td>{{ item.roleName }}</td>
-          <td>{{ item.homePage }}</td>
-          <td>
-            <v-row>
-              <v-col cols="3" v-for="acc in access" :key="acc.path">
-                <v-switch
-                  class="text-sm-body-1"
+          <td>{{ index + 1 }}</td>
+          <td class="text-no-wrap">{{ item.roleName }}</td>
+          <td class="text-no-wrap">{{ item.homePage }}</td>
+          <!-- <td>
+            <v-row class="">
+              <v-col cols="6" v-for="acc in access.setups" :key="acc.path">
+                <v-checkbox
+                  class="text-sm-body-1 text-no-wrap"
                   @change="editAkses(item)"
                   :value="acc.path"
                   density="compact"
                   hide-details
                   :label="acc.title"
                   v-model="roles[index].akses"
-                  :disabled="acc.path == item.homePage"
+                  :disabled="
+                    acc.path == item.homePage || item.roleId == systemId
+                  "
                 />
               </v-col>
             </v-row>
           </td>
+          <td>
+            <v-row>
+              <v-col cols="6" v-for="acc in access.menus" :key="acc.path">
+                <v-checkbox
+                  class="text-sm-body-1 text-no-wrap"
+                  @change="editAkses(item)"
+                  :value="acc.path"
+                  density="compact"
+                  hide-details
+                  :label="acc.title"
+                  v-model="roles[index].akses"
+                  :disabled="
+                    acc.path == item.homePage || item.roleId == systemId
+                  "
+                />
+              </v-col>
+            </v-row>
+          </td> -->
           <td class="text-center">
-            <v-btn-group density="compact">
+            <v-btn-group v-if="item.roleId != 0" density="compact">
               <v-btn @click="openDialog(item, false)">
                 <v-icon color="primary">mdi-database-edit</v-icon>
               </v-btn>
@@ -86,8 +107,8 @@
       v-model="dialog"
       scrollable
       persistent
+      width="800"
       :overlay="false"
-      max-width="400"
       transition="dialog-transition"
     >
       <v-card>
@@ -161,6 +182,7 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 
+const systemId = ref(0);
 const store = useAppStore();
 const search = ref("");
 const roles = ref([]);
@@ -182,6 +204,7 @@ const refresh = async () => {
     roles.value = await Promise.all(
       roles.value.map((role) => {
         role.akses = JSON.parse(role.akses);
+        role.inspectionAccess = JSON.parse(role.inspectionAccess);
         return role;
       })
     );
@@ -212,21 +235,13 @@ const openDialog = (item, del) => {
 
 const setups = store.setups;
 const menus = store.menus;
-const access = ref([...setups, ...menus]);
+const access = ref({
+  setups,
+  menus,
+});
 onBeforeMount(() => {
   refresh();
 });
-
-const editAkses = async (item) => {
-  try {
-    let formData = item;
-
-    await store.ajax(formData, "/auth/editrole", "post");
-    store.preload = false;
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 const deleteRole = async () => {
   try {
@@ -234,6 +249,7 @@ const deleteRole = async () => {
     store.preload = true;
     await store.ajax({ roleId }, "/auth/deleterole", "post");
     dialog.value = false;
+    store.roleUpdate++;
     refresh();
   } catch (error) {
     console.log(error);

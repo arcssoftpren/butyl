@@ -11,4 +11,14 @@ const db = mysql.createPool({
   queueLimit: 0,
 });
 
+const db_ = mysql.createPool({
+  host: "153.92.15.16",
+  user: "u572955615_butyl",
+  password: "Monksayang111988",
+  database: "u572955615_butyl",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
 module.exports = db;

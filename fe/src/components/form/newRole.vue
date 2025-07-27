@@ -50,13 +50,13 @@ const structure = [
   {
     key: "roleName",
     label: "Role Name",
-    hint: "Please insert your new role's name.",
+    hint: "Please enter your new role's name.",
     type: "text",
   },
   {
     key: "homePage",
     label: "Home Page",
-    hint: "Please select your new role's home page. ",
+    hint: "Please enter your new role's home page. ",
     type: "autocomplete",
   },
 ];

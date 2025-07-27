@@ -2,7 +2,6 @@
 import { defineStore } from "pinia";
 import Swal from "sweetalert2";
 import $ from "jquery";
-import { tr } from "vuetify/locale";
 
 export const useAppStore = defineStore("app", {
   persist: {
@@ -16,9 +15,10 @@ export const useAppStore = defineStore("app", {
       icon: "mdi-view-dashboard",
       path: "/dashboard",
     },
+    roleUpdate: 0,
     preload: false,
-    apiServer: "http://192.168.1.188:3235",
-    // apiServer: "http://192.168.1.188:3235",
+    // apiServer: "https://aiapi.miit-s.com",
+    apiServer: "http://192.168.1.10:3235",
     appConfig: {
       themeDark: true,
     },
@@ -61,15 +61,58 @@ export const useAppStore = defineStore("app", {
         icon: "mdi-account-multiple",
         path: "/setup/accounts",
       },
+      {
+        title: "Methode Setup",
+        subtitle: "Manage your inspection method data here.",
+        icon: "mdi-ruler-square",
+        path: "/setup/methods",
+      },
+      {
+        title: "WP Type Setup",
+        subtitle: "Manage your type data here.",
+        icon: "mdi-shape",
+        path: "/setup/type",
+      },
+      {
+        title: "Parts Setup",
+        subtitle: "Manage your parts data here.",
+        icon: "mdi-cube",
+        path: "/setup/parts",
+      },
+      {
+        title: "Inspection Logic",
+        subtitle: "Setup inspection logics here.",
+        icon: "mdi-application-cog",
+        path: "/setup/inspectionlogic",
+      },
     ],
     menus: [
       {
-        title: "Dashboard",
-        subtitle: "Home page of your role.",
-        icon: "mdi-view-dashboard",
-        path: "/dashboard",
+        title: "New Inspection",
+        subtitle: "Generate and run a new inspection.",
+        icon: "mdi-ruler",
+        path: "/dashboard/newinspection",
+      },
+      {
+        title: "NG Inspection",
+        subtitle: "review rejected inspections.",
+        icon: "mdi-exclamation",
+        path: "/dashboard/nginspection",
+      },
+      {
+        title: "Approval Page",
+        subtitle: "Make an ispection approval.",
+        icon: "mdi-draw",
+        path: "/dashboard/approval",
+      },
+      {
+        title: "Finished Inspection",
+        subtitle: "review rejected inspections.",
+        icon: "mdi-check",
+        path: "/dashboard/finishinspection",
       },
     ],
+    insAccess: ["kneading", "extruding", "press", "outgoing"],
   }),
   actions: {
     togglePreload(f) {
@@ -101,6 +144,11 @@ export const useAppStore = defineStore("app", {
         });
       });
     },
+    async refreshAccountData() {
+      const userNik = this.userData.userNik;
+      this.userData = await this.ajax({ userNik }, "/auth/getuserdata", "post");
+      this.preload = false;
+    },
 
     dataUrlToFile(dataUrl, fileName) {
       let arr = dataUrl.split(","), // Pisahkan header dan data
@@ -115,6 +163,7 @@ export const useAppStore = defineStore("app", {
 
       return new File([u8arr], fileName, { type: mime });
     },
+
     fileToDataURL(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -122,6 +171,61 @@ export const useAppStore = defineStore("app", {
         reader.onload = () => resolve(reader.result); // Hasil dalam bentuk Data URL
         reader.onerror = (error) => reject(error);
       });
+    },
+    checkLogic(logicType, standar, input) {
+      if (input === undefined || input === null) return false;
+      let inputVal = typeof input === "string" ? input.trim() : input;
+
+      const logicT = parseInt(logicType);
+      switch (logicT) {
+        case 1: // OK/NG Option
+          return inputVal === "OK";
+
+        case 2: // Number Range [min, max]
+          const min2 = parseFloat(standar[0]);
+          const max2 = parseFloat(standar[1]);
+          return input >= min2 && input <= max2;
+
+        case 3: // Larger Than (>)
+          const min3 = parseFloat(standar[0]);
+          return input > min3;
+
+        case 4: // Less Than (<)
+          const max4 = parseFloat(standar[0]);
+          return input < max4;
+
+        case 5: // Upper and Lower Limit [target, +x, -x]
+          const round = (v, d = 3) =>
+            Math.round(v * Math.pow(10, d)) / Math.pow(10, d);
+
+          const target = round(parseFloat(standar[0]));
+          const plus = round(parseFloat(standar[1]));
+          const minus = round(parseFloat(standar[2]));
+          inputVal = round(parseFloat(input));
+
+          return (
+            inputVal >= round(target - minus) &&
+            inputVal <= round(target + plus)
+          );
+        case 6: // ≥ target
+          const min6 = parseFloat(standar[0]);
+          return input >= min6;
+
+        case 7: // ≤ target
+          const max7 = parseFloat(standar[0]);
+          return input <= max7;
+
+        case 8: // Match Text (case-insensitive)
+          const expectedText = standar[0]?.toString().toLowerCase();
+          return inputVal?.toString().toLowerCase() === expectedText;
+
+        case 9: // Match Number (exact)
+          const expectedNumber = parseFloat(standar[0]);
+          return parseFloat(input) === expectedNumber;
+
+        default:
+          return false;
+      }
     },
   },
 });

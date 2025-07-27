@@ -25,7 +25,7 @@
     ></v-switch>
     <v-divider class="my-2"></v-divider>
     <v-btn @click="submit" rounded="pill" variant="outlined" block dark>
-      submit
+      Login
     </v-btn>
   </div>
 </template>
@@ -54,13 +54,13 @@ const struktur = ref([
     type: () => "text",
     key: "userNik",
     label: "User NIK",
-    hint: "Please insert your Employee Identification Number (NIK)",
+    hint: "Please enter your Employee Identification Number (NIK)",
   },
   {
     type: () => (showPass.value ? "text" : "password"),
     key: "userPass",
     label: "User Password",
-    hint: "Please insert your password",
+    hint: "Please enter your password",
   },
 ]);
 

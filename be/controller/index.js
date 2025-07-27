@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("./auth");
+const part = require("./part");
 
 router.post("/login", auth.login);
 
@@ -8,5 +9,34 @@ router.post("/auth/getroles", auth.getRoles);
 router.post("/auth/newrole", auth.newRoles);
 router.post("/auth/editrole", auth.editRole);
 router.post("/auth/deleterole", auth.deleteRole);
+router.post("/auth/adduser", auth.addUser);
+router.post("/auth", auth.getUsers);
+router.post("/auth/getsignfile", auth.getSignFile);
+router.post("/auth/edituser", auth.editUser);
+router.post("/auth/deleteuser", auth.deleteUser);
+router.post("/auth/getuserdata", auth.getUserData);
+
+router.post("/inspection/logics", part.getLogics);
+router.post("/inspection/methods", part.getTools);
+router.post("/inspection/addmethod", part.addMethod);
+router.post("/inspection/editmethod", part.editMethod);
+router.post("/inspection/deletemethod", part.deleteMethode);
+router.post("/inspection/initiate", part.inititateInspection);
+router.post("/inspection", part.getInspections);
+router.post("/inspection/getng", part.getNG);
+router.post("/inspection/edit", part.editInspections);
+router.post("/inspection/ng", part.editInspectionsNG);
+router.post("/inspection/sa", part.sa);
+
+router.post("/parts/add", part.addPart);
+router.post("/parts/", part.getParts);
+router.post("/parts/getdrawing", part.getPartDrawing);
+router.post("/parts/edit", part.editPart);
+router.post("/parts/delete", part.deletePart);
+router.post("/parts/getactimage", part.getActImage);
+router.post("/parts/addtype", part.addType);
+router.post("/parts/gettypes", part.getTypes);
+router.post("/parts/edittype", part.editType);
+router.post("/parts/deletetype", part.deleteType);
 
 module.exports = router;

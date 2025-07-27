@@ -20,7 +20,15 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/dashboard/': RouteRecordInfo<'/dashboard/', '/dashboard', Record<never, never>, Record<never, never>>,
+    '/dashboard/approval': RouteRecordInfo<'/dashboard/approval', '/dashboard/approval', Record<never, never>, Record<never, never>>,
+    '/dashboard/finishinspection': RouteRecordInfo<'/dashboard/finishinspection', '/dashboard/finishinspection', Record<never, never>, Record<never, never>>,
+    '/dashboard/newinspection': RouteRecordInfo<'/dashboard/newinspection', '/dashboard/newinspection', Record<never, never>, Record<never, never>>,
+    '/dashboard/nginspection': RouteRecordInfo<'/dashboard/nginspection', '/dashboard/nginspection', Record<never, never>, Record<never, never>>,
     '/setup/accounts': RouteRecordInfo<'/setup/accounts', '/setup/accounts', Record<never, never>, Record<never, never>>,
+    '/setup/inspectionLogic': RouteRecordInfo<'/setup/inspectionLogic', '/setup/inspectionLogic', Record<never, never>, Record<never, never>>,
+    '/setup/methods': RouteRecordInfo<'/setup/methods', '/setup/methods', Record<never, never>, Record<never, never>>,
+    '/setup/parts': RouteRecordInfo<'/setup/parts', '/setup/parts', Record<never, never>, Record<never, never>>,
     '/setup/role': RouteRecordInfo<'/setup/role', '/setup/role', Record<never, never>, Record<never, never>>,
+    '/setup/type': RouteRecordInfo<'/setup/type', '/setup/type', Record<never, never>, Record<never, never>>,
   }
 }

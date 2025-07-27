@@ -47,10 +47,36 @@ router.beforeEach((e) => {
   const store = useAppStore();
   const akses = store.userData.akses;
   const homePage = store.userData.homePage;
+  const matched = e.matched;
+
+  if (matched.length < 1) {
+    router.push("/");
+  }
 
   if (path != "/") {
     if (akses.length == 0) {
       router.push("/");
+    }
+    const menus = store.menus;
+    const setups = store.setups;
+
+    const findMenus = menus.find((m) => m.path == path);
+    const findSetups = setups.find((m) => m.path == path);
+    if (findMenus) {
+      store.page = findMenus;
+    } else {
+      store.page = findSetups;
+    }
+
+    let acc = store.userData.akses;
+
+    if (!acc.includes(path)) {
+      router.push(homePage);
+      store.swal.fire({
+        title: "Forbiden",
+        text: "You have not enough right to access the page.",
+        icon: "error",
+      });
     }
   } else {
     if (akses.length > 0) {

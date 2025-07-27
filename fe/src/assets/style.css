@@ -1,13 +1,16 @@
-.floating-button{
-    position: fixed;
-    right: 20px;
-    top: 20px;
+.floating-button {
+  position: fixed;
+  right: 20px;
+  top: 20px;
 }
-.floating-button-bottom{
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
+.floating-button-bottom {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
 }
-.swal-custom-zindex{
-    z-index: 9999;
+.swal-custom-zindex {
+  z-index: 9999;
+}
+.v-checkbox .v-label {
+  text-wrap: nowrap !important;
 }

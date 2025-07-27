@@ -34,5 +34,5 @@ app.use("/", router);
 const server = http.createServer(app);
 
 server.listen(PORT, IP, () => {
-  console.log("Server running at http://192.168.1.188:3235");
+  console.log(`Server running at http://${IP}:${PORT}`);
 });
