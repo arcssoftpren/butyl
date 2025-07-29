@@ -27,6 +27,10 @@ router.post("/inspection/getng", part.getNG);
 router.post("/inspection/edit", part.editInspections);
 router.post("/inspection/ng", part.editInspectionsNG);
 router.post("/inspection/sa", part.sa);
+router.post("/inspection/newinsitem", part.newInsItem);
+router.post("/inspection/items", part.getInsItems);
+router.post("/inspection/editinsitem", part.editInsItem);
+router.post("/inspection/deleteitem", part.deleteInsItem);
 
 router.post("/parts/add", part.addPart);
 router.post("/parts/", part.getParts);

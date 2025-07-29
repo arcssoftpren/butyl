@@ -50,7 +50,7 @@
           <td>
             <v-img height="100" :src="images.extruding[item.extrudingType]" />
           </td>
-          <td>
+          <!-- <td>
             <v-checkbox
               label="Extruding Dies Temp. Check"
               v-model="item.heaterOn"
@@ -72,7 +72,7 @@
               density="compact"
               hide-details=""
             />
-          </td>
+          </td> -->
           <td class="text-center">
             <v-btn-group density="compact" variant="outlined" rounded="pill">
               <v-btn @click="openDialog('edit', item)" color="primary">
@@ -217,11 +217,11 @@ const headers = ref([
     key: "extrudingType",
     align: "center",
   },
-  {
-    title: "Extra Inspections",
-    key: "partNumber",
-    align: "center",
-  },
+  // {
+  //   title: "Extra Inspections",
+  //   key: "partNumber",
+  //   align: "center",
+  // },
   {
     title: "Actions",
     key: "partNumber",

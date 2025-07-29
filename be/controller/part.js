@@ -9,7 +9,6 @@ const moment = require("moment");
 module.exports = {
   getLogics: async (req, res) => {
     const db = new Crud();
-    db.where("id", "<=", 9);
     const response = await db.get("inspection_logic");
     return res.status(200).json(response);
   },
@@ -40,18 +39,36 @@ module.exports = {
       await db2.insert("t_part", data);
 
       if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send("No files were uploaded.");
+        return res.status(200).send("No files were uploaded.");
       }
 
-      const uploadedFile = req.files.drawingFile;
+      const uploadedFile = req.files.partDrawing;
+      const uploadedFile2 = req.files.actImage;
       const filePath = path.join(
         __dirname,
         "../uploads/drawings/",
         `${partNumber}_drawing.png`
       );
 
+      const filePath2 = path.join(
+        __dirname,
+        "../uploads/drawings/",
+        `${partNumber}_actual.png`
+      );
+
       uploadedFile.mv(filePath, function (err) {
         if (err) {
+          throw {
+            title: "Upload Error",
+            text: "the file is not uploaded, please try again!",
+            icon: "error",
+            timer: 3000,
+          };
+        }
+      });
+
+      uploadedFile2.mv(filePath2, function (err2) {
+        if (err2) {
           throw {
             title: "Upload Error",
             text: "the file is not uploaded, please try again!",
@@ -639,6 +656,84 @@ module.exports = {
       return res.status(200).json({});
     } catch (error) {
       console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+  newInsItem: async (req, res) => {
+    try {
+      const data = req.body;
+      const { inspectionLable } = data;
+      const db = new Crud();
+      db.where("inspectionLable", "=", inspectionLable);
+      const dupe = await db.get("t_insitem");
+      if (dupe.length > 0)
+        throw {
+          title: "Duplicate Name",
+          text: "The name is already taken by another item, please use a new name.",
+          icon: "error",
+        };
+
+      const db2 = new Crud();
+      await db2.insert("t_insitem", data);
+
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(400).json(error);
+    }
+  },
+  getInsItems: async (req, res) => {
+    try {
+      const db = new Crud();
+      db.select("*");
+      db.select("t_insitem.id as insId");
+      db.join("left", "t_method", "t_method.id", "t_insitem.method");
+      db.join(
+        "left",
+        "inspection_logic",
+        "inspection_logic.id",
+        "t_insitem.logic"
+      );
+      const items = await db.get("t_insitem");
+
+      return res.status(200).json(items);
+    } catch (error) {
+      return res.status(400).json(error);
+    }
+  },
+  editInsItem: async (req, res) => {
+    try {
+      const data = req.body;
+      const { inspectionLable, id } = data;
+      const db = new Crud();
+      db.where("inspectionLable", "=", inspectionLable);
+      db.where("id", "!=", id);
+      const dupe = await db.get("t_insitem");
+      if (dupe.length > 0)
+        throw {
+          title: "Duplicate Name",
+          text: "The name is already taken by another item, please use a new name.",
+          icon: "error",
+        };
+
+      const db2 = new Crud();
+      db2.where("id", "=", id);
+      await db2.update("t_insitem", data);
+
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(400).json(error);
+    }
+  },
+  deleteInsItem: async (req, res) => {
+    try {
+      const data = req.body;
+      const { insId } = data;
+      const db = new Crud();
+      db.where("id", "=", insId);
+      await db.delete("t_insitem");
+
+      return res.status(200).json(data);
+    } catch (error) {
       return res.status(400).json(error);
     }
   },

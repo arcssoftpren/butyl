@@ -9,10 +9,11 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     A4Viewer: typeof import('./src/components/misc/a4Viewer.vue')['default']
+    Addpart: typeof import('./src/components/form/addpart.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppPreload: typeof import('./src/components/misc/appPreload.vue')['default']
     AppTools: typeof import('./src/components/misc/appTools.vue')['default']
-    copy: typeof import('./src/components/form/newWpType copy.vue')['default']
+    copy: typeof import('./src/components/form/newinspectionItem copy.vue')['default']
     EditInsItem: typeof import('./src/components/form/editInsItem.vue')['default']
     EditInstItem: typeof import('./src/components/form/editInstItem.vue')['default']
     EditPart: typeof import('./src/components/form/editPart.vue')['default']
@@ -32,6 +33,7 @@ declare module 'vue' {
     NewInsItem: typeof import('./src/components/form/newInsItem.vue')['default']
     NewInspection: typeof import('./src/components/form/newInspection.vue')['default']
     NewInspectionForm: typeof import('./src/components/form/newInspectionForm.vue')['default']
+    NewinspectionItem: typeof import('./src/components/form/newinspectionItem.vue')['default']
     NewInstpectionItem: typeof import('./src/components/form/newInstpectionItem.vue')['default']
     NewKneadingItem: typeof import('./src/components/form/newKneadingItem.vue')['default']
     NewMethod: typeof import('./src/components/form/newMethod.vue')['default']

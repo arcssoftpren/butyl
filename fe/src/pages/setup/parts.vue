@@ -87,25 +87,22 @@
         </template>
         <template #title>{{ dialogData.title }}</template>
         <template #subtitle>{{ dialogData.subtitle }}</template>
-        <template #prepend>
-          <v-icon
-            size="40"
-            :color="dialogData.key == 'delete' ? 'warning' : 'primary'"
-            >{{ dialogData.icon }}</v-icon
-          >
-        </template>
+
         <template #append>
           <v-btn flat icon @click="dialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
         <template #text>
-          <newPart :close-me="refresh" v-if="dialogData.key == 'new'"></newPart>
+          <!-- <newPart :close-me="refresh" v-if="dialogData.key == 'new'"></newPart> -->
+
+          <addpart :close-me="refresh" v-if="dialogData.key == 'new'"></addpart>
           <editPart
             :selected-item="selected"
             :close-me="refresh"
             v-if="dialogData.key == 'edit'"
-          ></editPart>
+          >
+          </editPart>
           <div class="text-center" v-if="dialogData.key == 'delete'">
             <h1 class="text-h5">Delete {{ selected.partNumber }}?</h1>
             <v-divider class="my-2"></v-divider>

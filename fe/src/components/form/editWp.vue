@@ -141,6 +141,59 @@
       <v-divider></v-divider>
     </v-col>
     <v-col cols="12">
+      <v-divider class="my-5">Inspection Item Template</v-divider>
+    </v-col>
+  </v-row>
+  <div class="w-100" style="height: 250px; overflow-y: scroll">
+    <v-row>
+      <v-col cols="6" v-for="(item, index) in steps" :key="index">
+        <v-divider>{{ item }}</v-divider>
+        <v-table fixed-header height="200" density="compact">
+          <thead>
+            <tr>
+              <th class="text-start w-100">Items</th>
+              <th class="text-center">Enable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(insItem, insIndex) in insItems" :key="insIndex">
+              <td class="text-start">
+                <div
+                  @click="
+                    () => {
+                      const key = `${item.toLowerCase()}Items`;
+                      const index = formData[key].findIndex(
+                        (e) => e === insItem.insId
+                      );
+
+                      if (index === -1) {
+                        formData[key].push(insItem.insId);
+                      } else {
+                        formData[key].splice(index, 1);
+                      }
+                    }
+                  "
+                >
+                  {{ insItem.inspectionLable }}
+                </div>
+              </td>
+              <td class="text-center">
+                <v-checkbox-btn
+                  :value="insItem.insId"
+                  v-model="formData[`${item.toLowerCase()}Items`]"
+                ></v-checkbox-btn>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-col>
+      <v-col cols="12">
+        <v-divider></v-divider>
+      </v-col>
+    </v-row>
+  </div>
+  <v-row>
+    <v-col cols="12">
       <v-btn @click="submit" block variant="outlined" rounded="pill" dark>
         Submit
       </v-btn>
@@ -163,6 +216,7 @@ const props = defineProps(["closeMe", "selected"]);
 const emit = defineEmits(["editData"]);
 const store = useAppStore();
 const extType = ref(extA);
+const insItems = ref([]);
 let formData = reactive({
   id: props.selected.id,
   typeNumber: props.selected.typeNumber,
@@ -172,12 +226,21 @@ let formData = reactive({
   pressOn: props.selected.pressOn == 1 ? true : false,
   outGoingOn: props.selected.outGoingOn == 1 ? true : false,
   heaterOn: props.selected.heaterOn == 1 ? true : false,
+  kneadingItems: JSON.parse(props.selected.kneadingItems),
+  extrudingItems: JSON.parse(props.selected.extrudingItems),
+  pressItems: JSON.parse(props.selected.pressItems),
+  outgoingItems: JSON.parse(props.selected.outgoingItems),
 });
 
-onMounted(() => {
+const steps = ["Kneading", "Extruding", "Press", "Outgoing"];
+
+onMounted(async () => {
   formData.extrudingType = props.selected.extrudingType;
   formData.headerType = props.selected.headerType;
   formData.kneadingType = props.selected.kneadingType;
+
+  insItems.value = await store.ajax({}, "/inspection/items", "post");
+  store.preload = false;
 });
 
 watch(
@@ -209,6 +272,11 @@ const submit = async () => {
   try {
     const valid = await validate.value.$validate();
     if (valid) {
+      formData.outgoingItems = JSON.stringify(formData.outgoingItems);
+      formData.pressItems = JSON.stringify(formData.pressItems);
+      formData.kneadingItems = JSON.stringify(formData.kneadingItems);
+      formData.extrudingItems = JSON.stringify(formData.extrudingItems);
+
       emit("editData", { ...formData });
     }
   } catch (error) {

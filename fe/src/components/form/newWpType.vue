@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="3">
+    <v-col cols="12">
       <div class="d-flex flex-column">
         <v-text-field
           :error-messages="validate.typeNumber.$errors.map((e) => e.$message)"
@@ -11,7 +11,7 @@
           label="Type Number"
           v-model="formData.typeNumber"
         />
-        <v-checkbox
+        <!-- <v-checkbox
           density="compact"
           label="Extruding Dies Temperature Check"
           v-model="formData.heaterOn"
@@ -25,10 +25,10 @@
           density="compact"
           label="Outgoing Inspection"
           v-model="formData.outGoingOn"
-        />
+        /> -->
       </div>
     </v-col>
-    <v-col cols="3">
+    <v-col cols="4">
       <v-card class="mt-2">
         <template #title>Header Type</template>
         <template #text>
@@ -57,7 +57,7 @@
         </template>
       </v-card>
     </v-col>
-    <v-col cols="3">
+    <v-col cols="4">
       <v-card class="mt-2">
         <template #title>Kneading Type</template>
         <template #text>
@@ -86,7 +86,7 @@
         </template>
       </v-card>
     </v-col>
-    <v-col cols="3">
+    <v-col cols="4">
       <v-card class="mt-2">
         <template #title>Extruding Type</template>
         <template #text>
