@@ -7,6 +7,7 @@ import Vue from "@vitejs/plugin-vue";
 import VueRouter from "unplugin-vue-router/vite";
 import { VueRouterAutoImports } from "unplugin-vue-router";
 import Vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import path from "path";
 // import fs from "fs";
 
 // Utilities
@@ -86,5 +87,8 @@ export default defineConfig({
         api: "modern-compiler",
       },
     },
+  },
+  build: {
+    outDir: path.resolve(__dirname, "../be/dist"),
   },
 });

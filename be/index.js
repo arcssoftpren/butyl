@@ -21,15 +21,15 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => res.send("Hello World!"));
+// app.get("/", (req, res) => res.send("Hello World!"));
 
 const router = require("./controller");
 app.use("/", router);
 
-// app.use(express.static(path.join(__dirname, "dist")));
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "dist", "index.html"));
-// });
+app.use(express.static(path.join(__dirname, "dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 const server = http.createServer(app);
 
