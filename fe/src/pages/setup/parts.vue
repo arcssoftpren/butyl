@@ -104,8 +104,17 @@
           >
           </editPart>
           <div class="text-center" v-if="dialogData.key == 'delete'">
-            <h1 class="text-h5">Delete {{ selected.partNumber }}?</h1>
-            <v-divider class="my-2"></v-divider>
+            <v-row>
+              <v-col cols="12">
+                <h1 class="text-h5">
+                  You are Going to delete {{ selected.partNumber }}
+                </h1>
+                <div>Do you confirm?</div>
+              </v-col>
+              <v-col cols="12">
+                <v-divider class="my-2"></v-divider>
+              </v-col>
+            </v-row>
             <v-row>
               <v-col cols="6">
                 <v-btn
@@ -183,7 +192,7 @@ const refresh = async () => {
 
 const deletePart = async () => {
   await store.ajax({ partId: selected.value.partId }, "/parts/delete", "post");
-  store.preload = false;
+  refresh();
 };
 
 onBeforeMount(() => {

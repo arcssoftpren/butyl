@@ -7,13 +7,13 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const app = express();
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 
 const IP = process.env.IP || "127.0.0.1";
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "*", methods: ["POST", "GET"] }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(
   fileUpload({

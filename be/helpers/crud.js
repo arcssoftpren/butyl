@@ -161,6 +161,42 @@ class Crud {
     }
   }
 
+  async whereOr(table, orConditions) {
+    try {
+      if (this.selectArr.length === 0) {
+        this.selectArr.push("*");
+      }
+
+      const whereClause = orConditions
+        .map((cond) => {
+          return (
+            "(" +
+            Object.entries(cond)
+              .map(([key, val]) =>
+                val === null ? `${key} IS NULL` : `${key} = ?`
+              )
+              .join(" AND ") +
+            ")"
+          );
+        })
+        .join(" OR ");
+
+      const values = orConditions.flatMap((cond) =>
+        Object.values(cond).filter((v) => v !== null)
+      );
+
+      const query = `SELECT ${this.selectArr.join(
+        ", "
+      )} FROM ${table} WHERE ${whereClause}`;
+
+      const [rows] = await database.promise().query(query, values);
+
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async alter(table) {
     try {
       const [result] = await database

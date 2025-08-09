@@ -14,3 +14,75 @@
 .v-checkbox .v-label {
   text-wrap: nowrap !important;
 }
+
+.mytable {
+  border-collapse: collapse !important;
+  width: 100%;
+}
+
+.mytable td,
+.mytable th {
+  border: black, 1px, solid !important;
+  padding: 5px !important;
+  border-collapse: collapse !important;
+}
+
+.mytable2 {
+  border-collapse: collapse !important;
+  width: 100%;
+}
+
+.mytable2 td,
+.mytable2 th {
+  border: black, 1px, solid !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-bottom: 5px !important;
+  padding-top: 5px !important;
+  border-collapse: collapse !important;
+}
+
+.processTitle {
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.processItem {
+  font-size: 14pt;
+}
+
+.processHeader {
+  font-size: 14pt;
+}
+
+.itemInput {
+  font-size: 14pt;
+}
+
+.a4paper {
+  width: 210mm;
+  height: 297mm;
+}
+
+.a4-wrapper {
+  /* width: 2000px; */
+  height: 92%; /* atau tinggi tetap lain, misal: 600px */
+  overflow-y: scroll;
+  overflow-x: scroll;
+  background-color: #f0f0f0;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* tengah secara horizontal */
+  align-items: flex-start; /* atas secara vertikal */
+}
+
+.a4 {
+  width: 210mm !important;
+  height: 297mm;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  padding: 5mm;
+  font-family: "MS PGothic", "MS PGothic Regular", sans-serif;
+  box-sizing: border-box;
+}

@@ -1,340 +1,891 @@
 <template>
-  <v-data-table density="compact" :search="search" :items="reports">
-    <template #top>
-      <v-divider class="my-2"></v-divider>
-      <v-row>
-        <v-col cols="12">
-          <v-text-field
-            prepend-inner-icon="mdi-magnify"
-            label="Search Data"
-            variant="outlined"
-            rounded="pill"
-            density="compact"
-            v-model="search"
-            type="text"
-          />
-        </v-col>
-      </v-row>
-    </template>
-    <template #headers>
-      <tr class="text-uppercase">
-        <th class="text-center">No</th>
-        <th class="text-no-wrap">
-          Part Number <br />
-          <small>Part Name</small>
-        </th>
-        <th class="text-center text-no-wrap">Delivery Date</th>
-        <th class="text-center text-no-wrap">Order Number</th>
-        <th class="text-center">Approve</th>
-      </tr>
-    </template>
-    <template #item="{ item, index }">
-      <tr class="text-uppercase">
-        <td class="text-center">{{ index + 1 }}</td>
-        <td class="text-no-wrap">
-          {{ item.partNumber }} <br />
-          <small>{{ item.partData.partName }}</small>
-        </td>
-        <td class="text-center">
-          {{
-            item.deliveryDate
-              ? moment(item.deliveryDate).format("DD/MM/YYYY")
-              : "-"
-          }}
-        </td>
-        <td class="text-center">
-          {{ item.orderNumber != "not required" ? item.orderNumber : "-" }}
-        </td>
-        <td>
-          <v-btn
-            @click="openDialog(item)"
-            block
-            color="primary"
-            rounded="pill"
-            density="compact"
-            dark
-          >
-            Preview
-          </v-btn>
-        </td>
-      </tr>
-    </template>
-  </v-data-table>
-
-  <v-dialog v-model="dialog" :overlay="false" transition="dialog-transition">
-    <v-card v-if="togle">
-      <template #title>{{ dialogData.title }}</template>
-      <template #subtitle>{{ dialogData.subtitle }}</template>
-      <template #append>
-        <v-btn flat icon @click="dialog = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
+  <div>
+    <v-data-table :items="inspections" :search="search">
+      <template #top>
+        <v-toolbar color="transparent">
+          <template #title>
+            <v-text-field
+              class="mt-2"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
+              rounded="pill"
+              label="Search"
+              hide-details
+              density="compact"
+              v-model="search"
+            />
+          </template>
+        </v-toolbar>
       </template>
-      <template #text>
-        <div v-for="(iter, iterInd) in iterator" :key="iterInd">
-          <v-card class="mb-2" v-if="iter.view">
-            <template #title>
-              <div class="text-uppercase">
-                {{ iter.inspectionData }} Item
-              </div></template
+      <template #item="{ item, index }">
+        <tr>
+          <td class="text-center" :key="item.partNumber">{{ index + 1 }}</td>
+          <td :key="item.poNumber">
+            {{ item.poNumber }}
+          </td>
+          <td :key="item.partNumber">
+            {{ item.partNumber }}
+          </td>
+          <td class="text-end">
+            {{ item.prodQty }}
+          </td>
+          <td class="text-center">
+            <v-btn
+              density="compact"
+              variant="outlined"
+              rounded="pill"
+              block
+              @click="openDialog('open', item)"
+              >Check</v-btn
             >
-            <template #text>
-              <v-table>
-                <thead>
-                  <tr>
-                    <th rowspan="2" class="text-center">No</th>
-                    <th rowspan="2" class="text-center">Inspection Item</th>
-                    <th rowspan="2" class="text-center">Standard</th>
-                    <th rowspan="2" class="text-center">Measurement tool</th>
-                    <th :colspan="selected[iter.max]" class="text-center">
-                      Result
-                    </th>
-                  </tr>
-                  <tr>
-                    <th
-                      v-for="(i, ind) in selected[iter.insObj].result"
-                      :key="ind"
-                    >
-                      {{ ind }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(item, index) in selected[iter.inspectionData]"
-                    :key="index"
-                  >
-                    <td class="text-center">{{ index + 1 }}</td>
-                    <td class="text-center">{{ item.itemLabel }}</td>
-                    <td class="text-center">{{ item.view.standard }}</td>
-                    <td class="text-center">{{ item.view.method.romaji }}</td>
-                    <td
-                      :class="
-                        i[index].result == 'NG'
-                          ? 'text-error font-weight-bold'
-                          : ''
-                      "
-                      v-for="(i, ind) in selected[iter.insObj].result"
-                      :key="ind"
-                    >
-                      {{ i[index].input }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th colspan="4" class="text-end">Inspector</th>
-                    <th :colspan="selected[iter.max]" class="text-center">
-                      {{ selected[iter.insObj].inspector }}
-                    </th>
-                  </tr>
-                </tbody>
-              </v-table>
+          </td>
+        </tr>
+      </template>
+      <template #headers>
+        <tr>
+          <th class="text-center">No</th>
+          <th>PO Number</th>
+          <th>Part Number</th>
+          <th class="text-end">Qty.</th>
+          <th class="text-center">Review</th>
+        </tr>
+      </template>
+    </v-data-table>
+    <v-dialog
+      v-model="dialog"
+      scrollable
+      persistent
+      :overlay="false"
+      transition="dialog-transition"
+    >
+      <v-card>
+        <template #append>
+          <v-btn
+            @click="dialog = false"
+            density="compact"
+            variant="outlined"
+            icon
+            class="mt-2 ms-2"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+        <template #title>INSPECTION REVIEW</template>
+        <template #subtitle
+          >Please review the inspection data before approval</template
+        >
+        <template #text>
+          <!-- content -->
+          <div style="height: 400px; overflow-y: scroll" class="pa-5">
+            <div v-for="(item1, index1) in dataArr" :key="index1">
+              <div v-if="item1 != 'appearance'">
+                <v-card
+                  v-if="selected[`${item1}Data`].insItem.length > 0"
+                  class="my-2"
+                >
+                  <v-card-title class="bg-primary">
+                    <div class="text-uppercase">
+                      {{ item1 }} Inspection Data
+                    </div>
+                  </v-card-title>
+                  <v-card-text>
+                    <div class="text-h5 my-2">Inspection Data</div>
+                    <table class="mytable">
+                      <thead>
+                        <tr>
+                          <th rowspan="2">Inspection Items</th>
+                          <th rowspan="2">Standard</th>
+                          <th
+                            :colspan="
+                              selected[`${item1}Data`].insItem[0].steps.length
+                            "
+                          >
+                            Inspection Result
+                          </th>
+                          <th rowspan="2">Inspector</th>
+                          <th rowspan="2">Judgement</th>
+                        </tr>
+                        <tr>
+                          <th
+                            v-for="(item2, index2) in selected[`${item1}Data`]
+                              .insItem[0].steps"
+                            :key="index2"
+                          >
+                            {{ item2.key }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody v-if="item1 == 'kneading'">
+                        <tr
+                          class="text-center"
+                          v-for="(item, index) in selected[`${item1}Data`]
+                            .insItem"
+                          :key="index"
+                        >
+                          <td>{{ item.label }}</td>
+                          <td v-if="selected.partData.kneadingType == 'b'">
+                            {{
+                              store.checkLogic(
+                                item.logic.id,
+                                item.standard,
+                                "",
+                                true
+                              )
+                            }}
+                          </td>
 
-              <div v-if="selected.saNote[iter.inspectionData].author">
-                <v-divider class="mb-5"></v-divider>
-                <v-table>
-                  <thead>
-                    <tr>
-                      Special Acceptance
-                    </tr>
-                    <tr>
-                      <th class="w-100">Note</th>
-                      <th class="text-no-wrap">Accepted By</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        {{ selected.saNote[iter.inspectionData].note }}
-                      </td>
-                      <td class="text-no-wrap">
-                        {{ selected.saNote[iter.inspectionData].author }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
+                          <td class="text-center" v-else>
+                            See the kneading result
+                          </td>
+                          <td
+                            v-if="selected.partData.kneadingType == 'b'"
+                            class="text-center"
+                            v-for="(item3, index3) in item.steps"
+                            :key="index3"
+                          >
+                            <div
+                              :class="
+                                item3.items[index].judgement == 1
+                                  ? 'text-success'
+                                  : 'text-error'
+                              "
+                            >
+                              {{ item3.items[index].input }}
+                            </div>
+                          </td>
+                          <td
+                            v-if="
+                              selected.partData.kneadingType == 'a' &&
+                              index == 0
+                            "
+                            :rowspan="selected[`${item1}Data`].insItem.length"
+                            :colspan="item.steps.length"
+                          >
+                            <table class="w-100 mytable">
+                              <tbody>
+                                <tr class="text-center">
+                                  <td
+                                    colspan="2"
+                                    :class="
+                                      selected[`${item1}Data`].judgement == 'OK'
+                                        ? 'bg-success'
+                                        : 'bg-error'
+                                    "
+                                  >
+                                    Kneading Result:{{
+                                      selected[`${item1}Data`].judgement == "OK"
+                                        ? selected[`${item1}Data`].judgement
+                                        : "NG"
+                                    }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Quality PIC</td>
+                                  <td>
+                                    {{ selected.kneadingData.kneadingQlt.pic }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Approval Date</td>
+                                  <td>
+                                    {{
+                                      moment(
+                                        selected.kneadingData.kneadingQlt.date
+                                      ).format("DD/MM/YYYY")
+                                    }}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                          <td
+                            class="text-center"
+                            v-if="index == 0"
+                            :rowspan="selected.kneadingData.insItem.length"
+                          >
+                            {{ selected[`${item1}Data`].inspector.userName }}
+                          </td>
+                          <td
+                            :class="
+                              selected[`${item1}Data`].judgement == 'OK' ||
+                              selected[`${item1}Data`].judgement == '1'
+                                ? 'text-h4 bg-success'
+                                : 'text-h4 bg-error'
+                            "
+                            v-if="index == 0"
+                            :rowspan="selected.kneadingData.insItem.length"
+                          >
+                            <div>
+                              {{
+                                selected[`${item1}Data`].judgement == "OK" ||
+                                selected[`${item1}Data`].judgement == "1"
+                                  ? "OK"
+                                  : "NG"
+                              }}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+
+                      <tbody v-else>
+                        <tr
+                          class="text-center"
+                          v-for="(item, index) in selected[`${item1}Data`]
+                            .insItem"
+                          :key="index"
+                        >
+                          <td>{{ item.label }}</td>
+                          <td>
+                            {{
+                              store.checkLogic(
+                                item.logic.id,
+                                item.standard,
+                                "",
+                                true
+                              )
+                            }}
+                            {{ item.unit }}
+                          </td>
+
+                          <td
+                            :class="
+                              item3.items[index].isCheck
+                                ? 'text-center'
+                                : 'text-center bg-grey-lighten-3'
+                            "
+                            v-for="(item3, index3) in item.steps"
+                            :key="index3"
+                          >
+                            <div
+                              :class="
+                                item3.items[index].judgement == 1
+                                  ? 'text-success'
+                                  : 'text-error'
+                              "
+                            >
+                              {{ item3.items[index].input }}
+                            </div>
+                          </td>
+                          <td
+                            class="text-center"
+                            v-if="index == 0"
+                            :rowspan="selected[`${item1}Data`].insItem.length"
+                          >
+                            {{ selected[`${item1}Data`].inspector.userName }}
+                          </td>
+                          <td
+                            :class="
+                              selected[`${item1}Data`].judgement == '1'
+                                ? 'text-h4 bg-success'
+                                : 'text-h4 bg-error'
+                            "
+                            v-if="index == 0"
+                            :rowspan="selected[`${item1}Data`].insItem.length"
+                          >
+                            <div>
+                              {{
+                                selected[`${item1}Data`].judgement == "1"
+                                  ? "OK"
+                                  : "NG"
+                              }}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <v-divider class="my-2"></v-divider>
+
+                    <div v-if="selected.rejectionData.data[item1].length > 0">
+                      <div class="text-h5">Correction Data</div>
+                      <div
+                        v-if="
+                          item1 == 'kneading' &&
+                          selected.partData.kneadingType == 'a'
+                        "
+                      >
+                        <table class="mytable mt-2">
+                          <thead>
+                            <tr>
+                              <th>Correction Note</th>
+                              <th>Taken Action</th>
+                              <th>Review PIC</th>
+                              <th>Review Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="text-center"
+                              v-for="(item, index) in selected.rejectionData
+                                .data.kneading"
+                              :key="index"
+                            >
+                              <td>
+                                {{ item.note }}
+                              </td>
+                              <td v-if="item.action == 2" class="bg-success">
+                                Repaired
+                              </td>
+                              <td v-else class="bg-warning">
+                                Special Acceptance
+                              </td>
+                              <td>
+                                {{ item.inspector }}
+                              </td>
+                              <td>
+                                {{
+                                  moment(item.reviewDate).format("DD/MM/YYYY")
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div v-else>
+                        <table class="mytable">
+                          <thead>
+                            <tr>
+                              <th>Inspection Item</th>
+                              <th>Sample Number</th>
+                              <th>Standard</th>
+                              <th>Inspection Result</th>
+                              <th>Action</th>
+                              <th>Correction Note</th>
+                              <th>PIC</th>
+                              <th>Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="text-center"
+                              v-for="(rejitem, rejindex) in selected
+                                .rejectionData.data[item1]"
+                              :key="rejindex"
+                            >
+                              <td>{{ rejitem.label }}</td>
+                              <td>{{ rejitem.key }}</td>
+                              <td>
+                                {{
+                                  store.checkLogic(
+                                    rejitem.logic.id,
+                                    rejitem.standard,
+                                    "",
+                                    true
+                                  )
+                                }}
+                                {{ rejitem.unit }}
+                              </td>
+                              <td>
+                                {{ rejitem.input }}
+                              </td>
+                              <td class="bg-success" v-if="rejitem.action == 2">
+                                Repaired
+                              </td>
+                              <td class="bg-warning" v-else>
+                                Special Acceptance
+                              </td>
+                              <td>
+                                {{ rejitem.note }}
+                              </td>
+                              <td>
+                                {{ rejitem.inspector }}
+                              </td>
+                              <td>
+                                {{
+                                  moment(rejitem.reviewDate).format(
+                                    "DD/MM/YYYY"
+                                  )
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
               </div>
-            </template>
-          </v-card>
-        </div>
-      </template>
-    </v-card>
-    <v-card>
-      <template #title>{{ dialogData.title }}</template>
-      <template #subtitle>{{ dialogData.subtitle }}</template>
-      <template #append>
-        <v-btn flat icon @click="dialog = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
-      <template #text>
-        <div class="a4-wrapper">
-          <div class="a4">
-            <a4Viewer :selected="selected"></a4Viewer>
+
+              <div v-else>
+                <v-card>
+                  <v-card-title class="bg-primary">
+                    Appearance Inspection data
+                  </v-card-title>
+                  <v-card-text>
+                    <div
+                      class="w-100 pa-2"
+                      v-if="selected.partData.heaterCheck == 1"
+                    >
+                      <table class="mytable">
+                        <thead>
+                          <tr>
+                            <th>Item Check</th>
+                            <th>Standard</th>
+                            <th>Result</th>
+                            <th>Judgement</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="text-center">
+                            <td>Heater Temp</td>
+                            <td>
+                              Check temperature at beginning of production
+                            </td>
+                            <td>
+                              {{
+                                selected.appearanceData.data.heaterTemp.input !=
+                                ""
+                                  ? selected.appearanceData.data.heaterTemp
+                                      .input + "°C"
+                                  : "Not Checked"
+                              }}
+                            </td>
+                            <td
+                              v-if="
+                                selected.appearanceData.data.heaterTemp
+                                  .judgement
+                              "
+                            >
+                              OK
+                            </td>
+                            <td class="bg-error" v-else>NG</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div
+                      v-if="selected.partData.extrudingType == 'a'"
+                      class="w-100 pa-2"
+                    >
+                      <v-row>
+                        <!-- <v-col cols="2">
+                          <div class="text-center w-100 text-h5">Drawing</div>
+                          <v-img
+                            :src="
+                              selectedPics.drw ? selectedPics.drw : defDrawing
+                            "
+                          ></v-img>
+                        </v-col>
+                        <v-col cols="2">
+                          <div class="text-center w-100 text-h5">
+                            Actual Image
+                          </div>
+                          <v-img
+                            :src="
+                              selectedPics.act ? selectedPics.act : defDrawing
+                            "
+                          ></v-img>
+                        </v-col> -->
+                        <v-col cols="12">
+                          <table class="mytable">
+                            <thead>
+                              <tr>
+                                <td colspan="4">
+                                  <v-row>
+                                    <v-col cols="6">
+                                      Part Drawing
+                                      <v-img
+                                        height="150"
+                                        :src="
+                                          selectedPics.drw
+                                            ? selectedPics.drw
+                                            : defDrawing
+                                        "
+                                      ></v-img>
+                                    </v-col>
+                                    <v-col cols="6">
+                                      Actual Image
+                                      <v-img
+                                        height="150"
+                                        :src="
+                                          selectedPics.act
+                                            ? selectedPics.act
+                                            : defDrawing
+                                        "
+                                      ></v-img>
+                                    </v-col>
+                                  </v-row>
+                                </td>
+                              </tr>
+                            </thead>
+                            <thead>
+                              <tr>
+                                <th>Item Inspection</th>
+                                <th>Standard</th>
+                                <th>Inspection Result</th>
+                                <th>Judgement</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr class="text-center">
+                                <td>Release Paper Color</td>
+                                <td>
+                                  {{ selected.appearanceData.standard.color }}
+                                </td>
+                                <td
+                                  v-if="
+                                    selected.appearanceData.data.color.judgement
+                                  "
+                                >
+                                  {{ selected.appearanceData.data.color.input }}
+                                </td>
+                                <td v-else>Not Confirmed</td>
+                                <td
+                                  rowspan="2"
+                                  :class="
+                                    selected.appearanceData.data.color.judgement
+                                      ? 'bg-success'
+                                      : 'bg-error'
+                                  "
+                                >
+                                  <div
+                                    v-if="
+                                      selected.appearanceData.data.color
+                                        .judgement == 1
+                                    "
+                                  >
+                                    OK
+                                  </div>
+                                  <div v-else>NG</div>
+                                </td>
+                              </tr>
+
+                              <tr class="text-center">
+                                <td>Butyl Tape</td>
+                                <td>
+                                  Butyl tape can be peeled off from Release
+                                  paper
+                                </td>
+                                <td>
+                                  {{
+                                    selected.appearanceData.data.peel.input ==
+                                    "1"
+                                      ? "OK"
+                                      : "NG"
+                                  }}
+                                </td>
+                              </tr>
+                              <tr class="bg-grey-lighten-2 text-center">
+                                <td colspan="2">Inspector</td>
+                                <td colspan="2">
+                                  {{
+                                    selected.appearanceData.inspector.userName
+                                  }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <div
+                            v-if="
+                              selected.rejectionData.data.appearance.length > 0
+                            "
+                          >
+                            <div class="text-h5">Correction Data</div>
+
+                            <table class="mytable mt-2">
+                              <thead>
+                                <tr>
+                                  <th>Item</th>
+                                  <th>Correction Note</th>
+                                  <th>Taken Action</th>
+                                  <th>Review PIC</th>
+                                  <th>Review Date</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  class="text-center"
+                                  v-for="(item, index) in selected.rejectionData
+                                    .data.appearance"
+                                  :key="index"
+                                >
+                                  <td>
+                                    {{ store.extLabel[item.appKey] }}
+                                  </td>
+                                  <td>
+                                    {{ item.note }}
+                                  </td>
+                                  <td
+                                    v-if="item.action == 2"
+                                    class="bg-success"
+                                  >
+                                    Repaired
+                                  </td>
+                                  <td v-else class="bg-warning">
+                                    Special Acceptance
+                                  </td>
+                                  <td>
+                                    {{ item.inspector }}
+                                  </td>
+                                  <td>
+                                    {{
+                                      moment(item.reviewDate).format(
+                                        "DD/MM/YYYY"
+                                      )
+                                    }}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </div>
+                    <div
+                      v-if="selected.partData.extrudingType != 'a'"
+                      class="w-100 pa-2"
+                    >
+                      <table class="mytable">
+                        <thead>
+                          <tr>
+                            <td colspan="4">
+                              <v-row>
+                                <v-col cols="6">
+                                  Part Drawing
+                                  <v-img
+                                    height="150"
+                                    :src="
+                                      selectedPics.drw
+                                        ? selectedPics.drw
+                                        : defDrawing
+                                    "
+                                  ></v-img>
+                                </v-col>
+                                <v-col cols="6">
+                                  Actual Image
+                                  <v-img
+                                    height="150"
+                                    :src="
+                                      selectedPics.act
+                                        ? selectedPics.act
+                                        : defDrawing
+                                    "
+                                  ></v-img>
+                                </v-col>
+                              </v-row>
+                            </td>
+                          </tr>
+                          <tr class="text-center">
+                            <th>Inspection Item</th>
+                            <th>Standard</th>
+                            <th>Inspection Result</th>
+                            <th>Judgement</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="text-center">
+                            <td>Upper Surface</td>
+                            <td>
+                              {{
+                                store.extBlabel[
+                                  selected.appearanceData.standard.upper
+                                ]
+                              }}
+                            </td>
+                            <td>
+                              {{
+                                store.extBlabel[
+                                  selected.appearanceData.data.upper.input
+                                ]
+                              }}
+                            </td>
+                            <td
+                              v-if="
+                                selected.appearanceData.data.upper.judgement
+                              "
+                              class="bg-success"
+                            >
+                              OK
+                            </td>
+                            <td class="bg-error" v-else>NG</td>
+                          </tr>
+                          <tr class="text-center">
+                            <td>Bottom Surface</td>
+                            <td>
+                              {{
+                                store.extBlabel[
+                                  selected.appearanceData.standard.bottom
+                                ]
+                              }}
+                            </td>
+                            <td>
+                              {{
+                                store.extBlabel[
+                                  selected.appearanceData.data.bottom.input
+                                ]
+                              }}
+                            </td>
+                            <td
+                              v-if="
+                                selected.appearanceData.data.bottom.judgement
+                              "
+                              class="bg-success"
+                            >
+                              OK
+                            </td>
+                            <td class="bg-error" v-else>NG</td>
+                          </tr>
+                          <tr class="text-center">
+                            <td>Sheet Layout</td>
+                            <td>
+                              {{ selected.appearanceData.standard.sheetLayout }}
+                              Pcs/sheet
+                            </td>
+                            <td>
+                              {{
+                                selected.appearanceData.data.sheetLayout.input
+                              }}
+                              pcs/sheet
+                            </td>
+                            <td
+                              v-if="
+                                selected.appearanceData.data.sheetLayout
+                                  .judgement
+                              "
+                              class="bg-success"
+                            >
+                              OK
+                            </td>
+                            <td class="bg-error" v-else>NG</td>
+                          </tr>
+
+                          <tr class="bg-grey-lighten-2 text-center">
+                            <td colspan="2">Inspector</td>
+                            <td colspan="2">
+                              {{ selected.appearanceData.inspector.userName }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <v-divider class="my-2"></v-divider>
+                      <div
+                        v-if="selected.rejectionData.data.appearance.length > 0"
+                      >
+                        <div class="text-h5">Correction Data</div>
+
+                        <table class="mytable mt-2">
+                          <thead>
+                            <tr>
+                              <th>Item</th>
+                              <th>Correction Note</th>
+                              <th>Taken Action</th>
+                              <th>Review PIC</th>
+                              <th>Review Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="text-center"
+                              v-for="(item, index) in selected.rejectionData
+                                .data.appearance"
+                              :key="index"
+                            >
+                              <td>
+                                {{ store.extLabel[item.appKey] }}
+                              </td>
+                              <td>
+                                {{ item.note }}
+                              </td>
+                              <td v-if="item.action == 2" class="bg-success">
+                                Repaired
+                              </td>
+                              <td v-else class="bg-warning">
+                                Special Acceptance
+                              </td>
+                              <td>
+                                {{ item.inspector }}
+                              </td>
+                              <td>
+                                {{
+                                  moment(item.reviewDate).format("DD/MM/YYYY")
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </div>
+            </div>
           </div>
-        </div>
-        <v-btn class="mt-5" block color="primary" dark>Approve</v-btn>
-      </template>
-    </v-card>
-  </v-dialog>
+          <v-divider class="my-2"></v-divider>
+          <v-btn @click="approve" variant="outlined" rounded="pill" block
+            >Approve</v-btn
+          >
+        </template>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
-<style scoped>
-.a4-wrapper {
-  width: 100%;
-  height: 70vh; /* atau tinggi tetap lain, misal: 600px */
-  overflow: auto;
-  background-color: #f0f0f0;
-  padding: 20px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center; /* tengah secara horizontal */
-  align-items: flex-start; /* atas secara vertikal */
-}
-
-.a4 {
-  width: 1100px;
-  height: 1556px;
-  background: white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  padding: 5mm;
-  font-family: "MS PGothic", "MS PGothic Regular", sans-serif;
-  box-sizing: border-box;
-}
-</style>
 <script setup>
+import Inspection from "@/assets/inspectionHelper";
 import { useAppStore } from "@/stores/app";
-import useVuelidate from "@vuelidate/core";
-import { helpers, required } from "@vuelidate/validators";
 import moment from "moment";
+import defDrawing from "@/assets/defaultDesign.png";
 
-const togle = ref(false);
-
-const dialog2 = ref(false);
 const store = useAppStore();
-const parts = ref([]);
-const part = ref(null);
-const currentYear = moment().format("YYYY");
-const years = ref(Array.from({ length: 21 }, (_, i) => currentYear - 10 + i));
-const search = ref("");
-const reports = ref([]);
 const dialog = ref(false);
-const selected = ref(null);
+const selected = ref({});
+const selectedPics = reactive({
+  act: "",
+  drw: "",
+});
+const inspections = ref([]);
+const formData = reactive({});
+const search = ref("");
 const dialogData = reactive({
-  title: "Inspection Approval",
-  subtitle: "Preview the inspection before approval",
-  icon: "mdi-drawing",
-  key: "new",
+  key: "",
+  title: "",
+  subtitle: "",
 });
 
-const iterator = ref([
-  {
-    inspectionData: "kneading",
-    insObj: "kneadingIns",
-    max: "kneadingMax",
-    view: false,
-  },
-  {
-    inspectionData: "extruding",
-    insObj: "extrudingIns",
-    max: "extrudingMax",
-    view: false,
-  },
-  {
-    inspectionData: "press",
-    insObj: "pressIns",
-    max: "pressMax",
-    view: false,
-  },
-  {
-    inspectionData: "outgoing",
-    insObj: "outgoinIns",
-    max: "outgoingMax",
-    view: false,
-  },
-]);
+const dataArr = ["kneading", "appearance", "extruding", "press", "outgoing"];
 
-const saForm = reactive({
-  saNote: "",
-  id: 0,
-});
+const openDialog = async (key, item) => {
+  switch (key) {
+    case "new":
+      break;
+    case "open":
+      let data = {
+        ...item.insData,
+        headerData: item.headerData,
+        insId: item.insId,
+        judgement: item.judgement,
+        partNumber: item.partNumber,
+        inspectionStep: item.inspectionStep,
+      };
 
-watch(part, (e) => {
-  console.log(e);
-});
+      store
+        .ajax({ partNumber: item.partNumber }, "/parts/getdrawing", "post")
+        .then((e) => {
+          selectedPics.act = e.act;
+          selectedPics.drw = e.drw;
+          store.preload = false;
+        });
 
-watch(dialog, (f) => {
-  if (!f) part.value = null;
-});
-
-const rules = {
-  saNote: {
-    req: helpers.withMessage("This field is required", required),
-  },
-};
-
-const validate = useVuelidate(rules, saForm);
-
-const openDialog = (item) => {
-  selected.value = item;
+      let ins = new Inspection();
+      ins.registerData(data);
+      selected.value = ins;
+      break;
+    case "delete":
+      selected.value = item;
+      return;
+  }
   dialog.value = true;
-
-  let kneadingnArr = item.kneading.map((element) => {
-    return element.sampleQ;
-  });
-  selected.value["kneadingMax"] = Math.max(...kneadingnArr);
-
-  let extrudingnArr = item.extruding.map((element) => {
-    return element.sampleQ;
-  });
-  selected.value["extrudingMax"] = Math.max(...extrudingnArr);
-
-  if (item.pressEnable == 1) {
-    let pressnArr = item.press.map((element) => {
-      return element.sampleQ;
-    });
-    selected.value["pressMax"] = Math.max(...pressnArr);
-    iterator.value[2].view = true;
-  } else {
-    iterator.value[2].view = false;
-  }
-
-  if (item.outGoingEnabled == 1) {
-    let outgoingnArr = item.outgoing.map((element) => {
-      return element.sampleQ;
-    });
-    selected.value["outgoingMax"] = Math.max(...outgoingnArr);
-    iterator.value[3].view = true;
-  } else {
-    iterator.value[3].view = false;
-  }
-  iterator.value[0].view = true;
-  iterator.value[1].view = true;
 };
+
+watch(dialog, (e) => {
+  if (!e) refresh();
+});
 
 const refresh = async () => {
   dialog.value = false;
-  dialog2.value = false;
-  parts.value = await store.ajax({}, "/parts", "post");
-  reports.value = await store.ajax({}, "/inspection", "post");
-  reports.value = reports.value.filter((e) => {
-    const { kneadingIns, extrudingIns, pressIns, outgoingIns, partData } = e;
-    const { pressEnable, outGoingEnabled } = partData;
+  inspections.value = await store.ajax({ func: "OK" }, "/inspection", "post");
 
-    const isKneadingDone = kneadingIns !== null;
-    const isExtrudingDone = extrudingIns !== null;
-    const isPressDone = pressEnable === "1" ? pressIns !== null : true;
-    const isOutgoingDone =
-      outGoingEnabled === "1" ? outgoingIns !== null : true;
-
-    return isKneadingDone && isExtrudingDone && isPressDone && isOutgoingDone;
-  });
-  reports.value = await Promise.all(
-    reports.value.map((e) => {
-      e.saNotes = {};
-      if (e.saNote != null) {
-        e.saNote = JSON.parse(e.saNote);
-      }
-      return e;
-    })
+  inspections.value = inspections.value.filter(
+    (e) => e.insData.approval.date == ""
   );
   store.preload = false;
 };
@@ -343,14 +894,14 @@ onBeforeMount(() => {
   refresh();
 });
 
-const addReport = async () => {
-  try {
-    const valid = await validate.value.$validate();
-    if (valid) {
-      store.preload = true;
-      await store.ajax(saForm, "/inspection/aprove", "post");
-      refresh();
-    }
-  } catch (error) {}
-};
+async function approve() {
+  selected.value.approval.date = moment().format("YYYY-MM-DD");
+  selected.value.approval.picData = {
+    userName: store.userData.userName,
+    userId: store.userData.userId,
+  };
+  const json = selected.value.toJSON();
+  await store.ajax(json, "/inspection/save", "post");
+  refresh();
+}
 </script>

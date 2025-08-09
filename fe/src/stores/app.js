@@ -15,7 +15,20 @@ export const useAppStore = defineStore("app", {
       releasePaperWhite: "Release Paper White",
       filmNoShiwa: "Film (No Shiwa)",
       filmShiwa: "Film (Shiwa)",
-      arumi: "Aluminum foil",
+      arumi: "Aluminum Foil",
+    },
+    extLabel: {
+      color: "Release Paper color",
+      peel: "Butyl tape",
+      upper: "Upper Surface",
+      bottom: "Bottom Surface",
+      sheetLayout: "Sheet Layout",
+      holeCount: "Hole Count",
+      holeA: "Hole A",
+      holeB: "Hole B",
+      holeC: "Hole C",
+      holeD: "Hole D",
+      heaterTemp: "Heater Temp",
     },
     page: {
       title: "Dashboard",
@@ -25,8 +38,8 @@ export const useAppStore = defineStore("app", {
     },
     roleUpdate: 0,
     preload: false,
-    // apiServer: "https://aiapi.miit-s.com",
-    apiServer: "http://192.168.1.10:3235",
+    apiServer: "https://aiapi.miit-s.com",
+    // apiServer: "http://192.168.1.10:3235",
     appConfig: {
       themeDark: true,
     },
@@ -161,7 +174,7 @@ export const useAppStore = defineStore("app", {
     async refreshAccountData() {
       const userNik = this.userData.userNik;
       this.userData = await this.ajax({ userNik }, "/auth/getuserdata", "post");
-      this.preload = false;
+      // this.preload = false;
     },
 
     dataUrlToFile(dataUrl, fileName) {
@@ -255,7 +268,7 @@ export const useAppStore = defineStore("app", {
           if (!isLabel) {
             return input <= max7;
           } else {
-            return `≤ ${min6}`;
+            return `≤ ${max7}`;
           }
 
         case 8: // Match Text (case-insensitive)
@@ -286,9 +299,28 @@ export const useAppStore = defineStore("app", {
           } else {
             return `${standar[0]}`;
           }
+        case 17: // custom OK/NG
+          inputVal = parseFloat(input);
+          let t = parseFloat(standar[0]);
+          const tol = parseFloat(standar[1]);
+          const u = t + tol;
+          const l = t - tol;
+          if (!isLabel) {
+            return input <= u && input >= l;
+          } else {
+            return `${t} ± ${tol}`;
+          }
 
         default:
           return false;
+      }
+    },
+    isValidJSONObject(str) {
+      try {
+        const parsed = JSON.parse(str);
+        return typeof parsed === "object" && parsed !== null;
+      } catch {
+        return false;
       }
     },
   },

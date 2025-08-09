@@ -1,5 +1,6 @@
 <template>
   <v-dialog
+    style="z-index: 9999"
     v-model="store.preload"
     scrollable
     fullscreen

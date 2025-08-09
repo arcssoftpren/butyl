@@ -278,6 +278,21 @@
                               v-model="item.standard[ind]"
                             />
 
+                            <div v-if="item.logic.id == 17">
+                              <v-text-field
+                                @keyup="next(2)"
+                                variant="outlined"
+                                rounded="lg"
+                                density="compact"
+                                hide-details=""
+                                v-model="item.standard[ind]"
+                              >
+                                <template #prepend-inner v-if="ind == 1"
+                                  >±</template
+                                >
+                              </v-text-field>
+                            </div>
+
                             <!-- Case: logic.id == 2 (Number range with ~) -->
                             <div v-if="item.logic.id == 2">
                               <v-text-field
@@ -570,6 +585,21 @@
                               hide-details=""
                               v-model="item.standard[ind]"
                             />
+
+                            <div v-if="item.logic.id == 17">
+                              <v-text-field
+                                @keyup="next(3)"
+                                variant="outlined"
+                                rounded="lg"
+                                density="compact"
+                                hide-details=""
+                                v-model="item.standard[ind]"
+                              >
+                                <template #prepend-inner v-if="ind == 1"
+                                  >±</template
+                                >
+                              </v-text-field>
+                            </div>
 
                             <!-- Case: logic.id == 2 (Number range with ~) -->
                             <div v-if="item.logic.id == 2">
@@ -1047,6 +1077,21 @@
                               v-model="item.standard[ind]"
                             />
 
+                            <div v-if="item.logic.id == 17">
+                              <v-text-field
+                                @keyup="next(4)"
+                                variant="outlined"
+                                rounded="lg"
+                                density="compact"
+                                hide-details=""
+                                v-model="item.standard[ind]"
+                              >
+                                <template #prepend-inner v-if="ind == 1"
+                                  >±</template
+                                >
+                              </v-text-field>
+                            </div>
+
                             <!-- Case: logic.id == 2 (Number range with ~) -->
                             <div v-if="item.logic.id == 2">
                               <v-text-field
@@ -1329,6 +1374,21 @@
                               hide-details=""
                               v-model="item.standard[ind]"
                             />
+
+                            <div v-if="item.logic.id == 17">
+                              <v-text-field
+                                @keyup="next(5)"
+                                variant="outlined"
+                                rounded="lg"
+                                density="compact"
+                                hide-details=""
+                                v-model="item.standard[ind]"
+                              >
+                                <template #prepend-inner v-if="ind == 1"
+                                  >±</template
+                                >
+                              </v-text-field>
+                            </div>
 
                             <!-- Case: logic.id == 2 (Number range with ~) -->
                             <div v-if="item.logic.id == 2">
@@ -1905,6 +1965,7 @@ const arrayLength = {
   9: 1, // Match Number (exact)
   10: 1, // Not Equal
   16: 1,
+  17: 2,
 };
 const formData = reactive({
   customer: "",
@@ -1915,7 +1976,7 @@ const formData = reactive({
   width: 0,
   length: 0,
   sg: 0,
-  headers: ["prodQty", "kneadingLot", "extrudingLot"],
+  headers: ["prodQty", "kneadingLot", "extrudingLot", "poNumber"],
   kneadingType: "a",
   kneadingItems: [],
   heaterCheck: false,
@@ -2025,8 +2086,20 @@ watch(
       formData.extrudingItems = [];
       formData.headers =
         type.headerType == "a"
-          ? ["prodQty", "kneadingLot", "extrudingLot", "deliveryDate"]
-          : ["prodQty", "kneadingLot", "extrudingLot", "orderNumber"];
+          ? [
+              "prodQty",
+              "kneadingLot",
+              "extrudingLot",
+              "deliveryDate",
+              "poNumber",
+            ]
+          : [
+              "prodQty",
+              "kneadingLot",
+              "extrudingLot",
+              "orderNumber",
+              "poNumber",
+            ];
       const extItem = JSON.parse(type.extrudingItems);
       const kneItem = JSON.parse(type.kneadingItems);
 
@@ -2034,6 +2107,7 @@ watch(
         const item = insItem.value.find((ins) => ins.insId == element);
         let logicItem = logics.value.find((l) => l.id == item.logic);
         let data = {
+          id: element,
           label: item.inspectionLable,
           logic: logicItem,
           method: methods.value.find((m) => m.id == item.method),
@@ -2049,6 +2123,7 @@ watch(
         const item = insItem.value.find((ins) => ins.insId == element);
         let logicItem = logics.value.find((l) => l.id == item.logic);
         let data = {
+          id: element,
           label: item.inspectionLable,
           logic: logicItem,
           method: methods.value.find((m) => m.id == item.method),
@@ -2067,6 +2142,7 @@ watch(
           const item = insItem.value.find((ins) => ins.insId == element);
           let logicItem = logics.value.find((l) => l.id == item.logic);
           let data = {
+            id: element,
             label: item.inspectionLable,
             logic: logicItem,
             method: methods.value.find((m) => m.id == item.method),
@@ -2086,6 +2162,7 @@ watch(
           const item = insItem.value.find((ins) => ins.insId == element);
           let logicItem = logics.value.find((l) => l.id == item.logic);
           let data = {
+            id: element,
             label: item.inspectionLable,
             logic: logicItem,
             method: methods.value.find((m) => m.id == item.method),
@@ -2111,6 +2188,7 @@ watch(
         const item = insItem.value.find((ins) => ins.insId == element);
         let logicItem = logics.value.find((l) => l.id == item.logic);
         let data = {
+          id: element,
           label: item.inspectionLable,
           logic: logicItem,
           method: methods.value.find((m) => m.id == item.method),
@@ -2137,6 +2215,7 @@ watch(
         const item = insItem.value.find((ins) => ins.insId == element);
         let logicItem = logics.value.find((l) => l.id == item.logic);
         let data = {
+          id: element,
           label: item.inspectionLable,
           logic: logicItem,
           method: methods.value.find((m) => m.id == item.method),
@@ -2244,6 +2323,7 @@ const addItem = (arr) => {
   if (item) {
     let logicItem = logics.value.find((l) => l.id == item.logic);
     let data = {
+      id: insId,
       label: item.inspectionLable,
       logic: logicItem,
       method: methods.value.find((m) => m.id == item.method),
@@ -2312,6 +2392,12 @@ watch(step, (e) => {
       break;
     case 2:
       next(3);
+      break;
+    case 3:
+      next(4);
+      break;
+    case 4:
+      next(5);
       break;
   }
 });
