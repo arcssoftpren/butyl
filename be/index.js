@@ -10,8 +10,8 @@ const app = express();
 app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 
-const IP = process.env.IP || "127.0.0.1";
-const PORT = process.env.PORT || 3000;
+const IP = process.env.SERVER_IP || "127.0.0.1";
+const PORT = process.env.SERVER_PORT || 3000;
 
 app.use(cors({ origin: "*", methods: ["POST", "GET"] }));
 app.use(morgan("dev"));
