@@ -38,7 +38,9 @@ export const useAppStore = defineStore("app", {
     },
     roleUpdate: 0,
     preload: false,
-    apiServer: "https://aiapi.miit-s.com",
+    apiServer: `http://${import.meta.env.VITE_SERVER_IP || "localhost"}:${
+      import.meta.env.VITE_SERVER_PORT || 3235
+    }`,
     // apiServer: "http://192.168.1.10:3235",
     appConfig: {
       themeDark: true,
