@@ -65,13 +65,13 @@
       <v-col cols="12">
         <v-card>
           <template #title> Signature File Preview </template>
-          <v-card-text style="height: 30vh">
+          <v-card-text style="height: 170px">
             <v-divider></v-divider>
             <div
               class="h-100 w-100 d-flex flex-column justify-center align-center"
             >
-              <v-icon size="110" v-if="signFile == null">mdi-draw-pen</v-icon>
-              <v-img width="400" :src="fileDataURL" v-else></v-img>
+              <v-icon size="100" v-if="signFile == null">mdi-draw-pen</v-icon>
+              <v-img width="100" class="my-5" :src="fileDataURL" v-else></v-img>
             </div>
           </v-card-text>
         </v-card>

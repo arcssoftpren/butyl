@@ -1,5 +1,4 @@
 <template>
-  {{ selected }}
   <v-data-table :search="search" :items="methods">
     <template #top>
       <v-toolbar color="transparent">

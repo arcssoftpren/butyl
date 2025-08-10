@@ -93,7 +93,7 @@
               <v-icon size="110" v-if="fileDataURL == null"
                 >mdi-draw-pen</v-icon
               >
-              <v-img width="300" :src="fileDataURL" v-else></v-img>
+              <v-img class="my-5" width="100" :src="fileDataURL" v-else></v-img>
             </div>
           </v-card-text>
         </v-card>

@@ -42,37 +42,26 @@
           <td>{{ index + 1 }}</td>
           <td>{{ item.typeNumber }}</td>
           <td>
-            <v-img height="100" :src="images.header[item.headerType]"></v-img>
+            <v-img
+              class="my-2"
+              height="90"
+              :src="images.header[item.headerType]"
+            ></v-img>
           </td>
           <td>
-            <v-img height="100" :src="images.kneading[item.kneadingType]" />
+            <v-img
+              class="my-2"
+              height="90"
+              :src="images.kneading[item.kneadingType]"
+            />
           </td>
           <td>
-            <v-img height="100" :src="images.extruding[item.extrudingType]" />
+            <v-img
+              class="my-2"
+              height="90"
+              :src="images.extruding[item.extrudingType]"
+            />
           </td>
-          <!-- <td>
-            <v-checkbox
-              label="Extruding Dies Temp. Check"
-              v-model="item.heaterOn"
-              density="compact"
-              hide-details=""
-              @change="editBool(item)"
-            />
-            <v-checkbox
-              @change="editBool(item)"
-              label="Press Inspection"
-              v-model="item.pressOn"
-              density="compact"
-              hide-details=""
-            />
-            <v-checkbox
-              @change="editBool(item)"
-              label="Outgoing Inspection"
-              v-model="item.outGoingOn"
-              density="compact"
-              hide-details=""
-            />
-          </td> -->
           <td class="text-center">
             <v-btn-group density="compact" variant="outlined" rounded="pill">
               <v-btn @click="openDialog('edit', item)" color="primary">

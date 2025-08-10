@@ -1,5 +1,5 @@
 <template>
-  <v-stepper alt-labels editable="" v-model="step">
+  <v-stepper alt-labels v-model="step">
     <v-stepper-header>
       <v-stepper-item value="1">PART IDENTITY & DESIGN</v-stepper-item>
       <v-stepper-item value="2">KNEADING ITEMS</v-stepper-item>

@@ -114,6 +114,12 @@ export const useAppStore = defineStore("app", {
         icon: "mdi-application-cog",
         path: "/setup/inspectionlogic",
       },
+      {
+        title: "Tutorial Video",
+        subtitle: "See tutorial videos here.",
+        icon: "mdi-video",
+        path: "/setup/tutorial",
+      },
     ],
     menus: [
       {
