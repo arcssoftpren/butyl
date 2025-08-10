@@ -174,7 +174,7 @@ const refresh = async () => {
     store.togglePreload(true);
 
     roles.value = await store.ajax({}, "/auth/getroles", "post");
-
+    roles.value = roles.value.filter((role) => role.roleId != 1);
     store.togglePreload(false);
   } catch (error) {}
 };

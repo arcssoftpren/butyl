@@ -200,7 +200,7 @@ const refresh = async () => {
 
     roles.value = await store.ajax({}, "/auth/getroles", "post");
 
-    store.togglePreload(false);
+    roles.value = roles.value.filter((role) => role.roleId != 1);
     roles.value = await Promise.all(
       roles.value.map((role) => {
         role.akses = JSON.parse(role.akses);
@@ -208,6 +208,7 @@ const refresh = async () => {
         return role;
       })
     );
+    store.togglePreload(false);
   } catch (error) {}
 };
 const openDialog = (item, del) => {

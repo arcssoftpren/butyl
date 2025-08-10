@@ -141,7 +141,7 @@ export const useAppStore = defineStore("app", {
         path: "/dashboard/finishinspection",
       },
     ],
-    insAccess: ["kneading", "extruding", "press", "outgoing"],
+    insAccess: ["kneading", "appearance", "extruding", "press", "outgoing"],
   }),
   actions: {
     togglePreload(f) {

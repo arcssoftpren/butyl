@@ -184,6 +184,7 @@ const refresh = async () => {
     store.togglePreload(true);
 
     roles.value = await store.ajax({}, "/auth/getroles", "post");
+    roles.value = roles.value.filter((role) => role.roleId != 1);
     fileDataURL.value = await store.ajax(
       { userId: formData.userId },
       "/auth/getsignfile",

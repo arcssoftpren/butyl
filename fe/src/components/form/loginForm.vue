@@ -108,6 +108,8 @@ const submit = async () => {
     if (errorElement) {
       validity[errorElement] = false;
     }
+
+    store.togglePreload(false);
   }
 };
 </script>

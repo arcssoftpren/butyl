@@ -158,6 +158,8 @@ const openDialog = (item, del) => {
 const refresh = async () => {
   try {
     accounts.value = await store.ajax({}, "/auth", "post");
+
+    accounts.value = accounts.value.filter((account) => account.roleId != 1);
     store.preload = false;
   } catch (error) {
     console.log(error);

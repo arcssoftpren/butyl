@@ -58,6 +58,11 @@
           </td>
           <td class="text-center">
             <v-btn
+              :disabled="
+                !store.userData.inspectionAccess.includes(
+                  item.inspectionStep.step
+                )
+              "
               density="compact"
               variant="outlined"
               rounded="pill"

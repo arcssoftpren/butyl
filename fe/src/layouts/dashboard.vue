@@ -44,7 +44,7 @@
       />
       <template #append>
         <v-list>
-          <v-list-item nav prepend-icon="mdi-logout">
+          <v-list-item @click="dialog = true" nav prepend-icon="mdi-logout">
             <template #title> Sign Out </template>
             <template #subtitle> Sign out of the app. </template>
           </v-list-item>
@@ -71,13 +71,65 @@
         <v-icon>mdi-theme-light-dark</v-icon>
       </v-btn>
     </div>
+    <v-dialog
+      v-model="dialog"
+      scrollable
+      persistent
+      :overlay="false"
+      max-width="500px"
+      transition="dialog-transition"
+    >
+      <v-card class="text-center">
+        <v-card elevation="0">
+          <template #prepend>
+            <v-icon color="warning" size="50">mdi-help</v-icon>
+          </template>
+          <template #title>
+            <div class="text-h6">Are you sure you want to sign out?</div>
+          </template>
+          <template #subtitle>
+            <div>All unsaved changes will be lost.</div>
+          </template>
+          <template #text>
+            <v-row>
+              <v-col cols="12">
+                <v-divider></v-divider>
+              </v-col>
+              <v-col cols="6">
+                <v-btn
+                  prepend-icon="mdi-cancel"
+                  variant="outlined"
+                  rounded="pill"
+                  block
+                  @click="dialog = false"
+                  >Cancel</v-btn
+                >
+              </v-col>
+              <v-col cols="6">
+                <v-btn
+                  @click="logOut"
+                  prepend-icon="mdi-logout"
+                  variant="outlined"
+                  rounded="pill"
+                  block
+                  >Sign Out</v-btn
+                >
+              </v-col>
+            </v-row>
+          </template>
+        </v-card>
+      </v-card>
+    </v-dialog>
   </v-main>
 </template>
 <script setup>
+import router from "@/router";
 import { useAppStore } from "@/stores/app";
+import { fa } from "vuetify/locale";
 const store = useAppStore();
 const mainDrawer = ref(false);
 const setupDrawer = ref(false);
+const dialog = ref(false);
 
 watch(mainDrawer, (f) => {
   if (f) {
@@ -95,6 +147,20 @@ const dark = ref(store.appConfig.themeDark);
 watch(dark, (f) => {
   store.toggleTheme(f);
 });
+
+const logOut = () => {
+  store.preload = true;
+  store.userData = {
+    userNik: "",
+    userRole: 0,
+    userName: "",
+    roleName: "",
+    homePage: "",
+    akses: [],
+  };
+
+  router.push("/");
+};
 
 //
 </script>
