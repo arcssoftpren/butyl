@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 09 Agu 2025 pada 22.24
+-- Waktu pembuatan: 11 Agu 2025 pada 05.56
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -187,8 +187,7 @@ CREATE TABLE `t_role` (
 
 INSERT INTO `t_role` (`roleId`, `roleName`, `homePage`, `akses`, `inspectionAccess`) VALUES
 (1, 'IT Developer', '/dashboard/newinspection', '[\"/setup/accounts\",\"/setup/role\",\"/setup/parts\",\"/dashboard/newinspection\",\"/setup/inspectionlogic\",\"/setup/methods\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/type\",\"/setup/inspectionitem\"]', '[\"extruding\",\"press\",\"outgoing\",\"kneading\"]'),
-(10, 'Administrator', '/dashboard/newinspection', '[\"/setup/role\",\"/setup/accounts\",\"/dashboard/newinspection\",\"/setup/parts\",\"/setup/inspectionlogic\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/methods\",\"/setup/inspectionitem\",\"/setup/type\"]', '[\"kneading\",\"extruding\",\"press\",\"outgoing\"]'),
-(12, 'Quality Inspector', '/dashboard/newinspection', '[\"/dashboard/newinspection\"]', '[]');
+(10, 'Administrator', '/dashboard/newinspection', '[\"/setup/role\",\"/setup/accounts\",\"/dashboard/newinspection\",\"/setup/parts\",\"/setup/inspectionlogic\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/methods\",\"/setup/inspectionitem\",\"/setup/type\"]', '[\"kneading\",\"extruding\",\"press\",\"outgoing\"]');
 
 -- --------------------------------------------------------
 
@@ -246,9 +245,7 @@ CREATE TABLE `t_user` (
 
 INSERT INTO `t_user` (`userNik`, `userPass`, `userRole`, `userName`, `userId`) VALUES
 ('system', 'U2FsdGVkX19e0Sbt0KSrqCFffZpslzLskXuowH8+8A8=', 1, 'Adnan Fauzi Ahmad', 1),
-('admin', 'U2FsdGVkX18UN0IiGrV8Ms2ZUdJbpHWTgHKUNv5GSbM=', 10, 'admin utama', 8),
-('rian123', 'U2FsdGVkX19D7Sj93o+MUpFe8ADmWWIPe9lyz2PWzTA=', 12, 'Rian Nugraha', 9),
-('spi2010115', 'U2FsdGVkX1/SxnLva5Y3w7FBkI+aFXduxtT4oFE9U8A=', 12, 'Siti Humaeroh', 10);
+('admin', 'U2FsdGVkX18UN0IiGrV8Ms2ZUdJbpHWTgHKUNv5GSbM=', 10, 'admin utama', 8);
 
 --
 -- Indexes for dumped tables
