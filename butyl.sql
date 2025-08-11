@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 11 Agu 2025 pada 05.56
+-- Waktu pembuatan: 11 Agu 2025 pada 18.05
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `butyl`
 --
+CREATE DATABASE IF NOT EXISTS `butyl` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `butyl`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Struktur dari tabel `inspection_logic`
 --
 
+DROP TABLE IF EXISTS `inspection_logic`;
 CREATE TABLE `inspection_logic` (
   `id` int(11) NOT NULL,
   `description` varchar(255) NOT NULL,
@@ -58,6 +61,7 @@ INSERT INTO `inspection_logic` (`id`, `description`, `label`, `inputType`) VALUE
 -- Struktur dari tabel `t_insitem`
 --
 
+DROP TABLE IF EXISTS `t_insitem`;
 CREATE TABLE `t_insitem` (
   `id` int(11) NOT NULL,
   `inspectionLable` varchar(255) NOT NULL,
@@ -97,6 +101,7 @@ INSERT INTO `t_insitem` (`id`, `inspectionLable`, `logic`, `method`) VALUES
 -- Struktur dari tabel `t_inspection`
 --
 
+DROP TABLE IF EXISTS `t_inspection`;
 CREATE TABLE `t_inspection` (
   `insId` int(11) NOT NULL,
   `insData` longtext NOT NULL,
@@ -112,6 +117,7 @@ CREATE TABLE `t_inspection` (
 -- Struktur dari tabel `t_method`
 --
 
+DROP TABLE IF EXISTS `t_method`;
 CREATE TABLE `t_method` (
   `id` int(11) NOT NULL,
   `romaji` varchar(255) NOT NULL,
@@ -144,6 +150,7 @@ INSERT INTO `t_method` (`id`, `romaji`, `japanese`) VALUES
 -- Struktur dari tabel `t_part`
 --
 
+DROP TABLE IF EXISTS `t_part`;
 CREATE TABLE `t_part` (
   `partId` int(11) NOT NULL,
   `customer` tinytext NOT NULL,
@@ -173,6 +180,7 @@ CREATE TABLE `t_part` (
 -- Struktur dari tabel `t_role`
 --
 
+DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE `t_role` (
   `roleId` int(11) NOT NULL,
   `roleName` varchar(255) NOT NULL,
@@ -195,6 +203,7 @@ INSERT INTO `t_role` (`roleId`, `roleName`, `homePage`, `akses`, `inspectionAcce
 -- Struktur dari tabel `t_types`
 --
 
+DROP TABLE IF EXISTS `t_types`;
 CREATE TABLE `t_types` (
   `id` int(11) NOT NULL,
   `typeNumber` varchar(255) NOT NULL,
@@ -231,6 +240,7 @@ INSERT INTO `t_types` (`id`, `typeNumber`, `kneadingType`, `extrudingType`, `hea
 -- Struktur dari tabel `t_user`
 --
 
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `userNik` varchar(255) NOT NULL,
   `userPass` varchar(1024) NOT NULL,
