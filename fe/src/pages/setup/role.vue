@@ -208,7 +208,7 @@ const refresh = async () => {
         return role;
       })
     );
-    store.togglePreload(false);
+    store.preload = false;
   } catch (error) {}
 };
 const openDialog = (item, del) => {
