@@ -167,7 +167,6 @@ import extB from "@/assets/extrudingB.png";
 import extC from "@/assets/extrudingC.png";
 import kneadingA from "@/assets/kneading_a.png";
 import kneadingB from "@/assets/kneading_b.png";
-import { error } from "jquery";
 
 const store = useAppStore();
 const search = ref("");

@@ -112,4 +112,8 @@ const submit = async () => {
     store.togglePreload(false);
   }
 };
+
+onMounted(() => {
+  store.preload = false;
+});
 </script>

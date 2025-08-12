@@ -25,6 +25,15 @@
         <template #prepend>
           <v-icon size="45">{{ store.page.icon }}</v-icon>
         </template>
+        <template #append>
+          <v-btn
+            rounded="pill"
+            prepend-icon="mdi-multimedia"
+            @click="videoDialog = true"
+          >
+            Tutorial Video
+          </v-btn>
+        </template>
         <v-card-text class="h-100">
           <div class="h-100">
             <v-divider></v-divider>
@@ -120,16 +129,46 @@
         </v-card>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="videoDialog"
+      scrollable
+      persistent
+      :overlay="false"
+      max-width="700px"
+      transition="dialog-transition"
+    >
+      <v-card>
+        <template #append>
+          <v-btn @click="videoDialog = false" flat icon>
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+        <template #title>
+          <v-card-title>Tutorial Video</v-card-title>
+        </template>
+        <v-card-text>
+          <div
+            v-for="(item, index) in [...store.menus, ...store.setups]"
+            :key="index"
+          >
+            <videoViewer
+              :item="item"
+              v-if="$router.currentRoute.value.fullPath === item.path"
+            ></videoViewer>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-main>
 </template>
 <script setup>
 import router from "@/router";
 import { useAppStore } from "@/stores/app";
-import { fa } from "vuetify/locale";
 const store = useAppStore();
 const mainDrawer = ref(false);
 const setupDrawer = ref(false);
 const dialog = ref(false);
+const videoDialog = ref(false);
 
 watch(mainDrawer, (f) => {
   if (f) {

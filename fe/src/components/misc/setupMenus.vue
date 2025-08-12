@@ -38,5 +38,6 @@ onBeforeMount(async () => {
   await store.refreshAccountData();
   let acc = store.userData.akses;
   setups.value = setups.value.filter((item) => acc.includes(item.path));
+  store.preload = false;
 });
 </script>
