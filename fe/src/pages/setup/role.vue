@@ -204,7 +204,9 @@ const refresh = async () => {
     roles.value = await Promise.all(
       roles.value.map((role) => {
         role.akses = JSON.parse(role.akses);
-        role.inspectionAccess = JSON.parse(role.inspectionAccess);
+        role.inspectionAccess = isValidJSONObject(role.inspectionAccess)
+          ? JSON.parse(role.inspectionAccess)
+          : [];
         return role;
       })
     );
@@ -256,4 +258,13 @@ const deleteRole = async () => {
     console.log(error);
   }
 };
+
+function isValidJSONObject(str) {
+  try {
+    const parsed = JSON.parse(str);
+    return typeof parsed === "object" && parsed !== null;
+  } catch {
+    return false;
+  }
+}
 </script>
