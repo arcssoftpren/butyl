@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Agu 2025 pada 04.57
+-- Waktu pembuatan: 12 Agu 2025 pada 05.14
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -195,7 +195,8 @@ CREATE TABLE `t_role` (
 
 INSERT INTO `t_role` (`roleId`, `roleName`, `homePage`, `akses`, `inspectionAccess`) VALUES
 (1, 'IT Developer', '/dashboard/newinspection', '[\"/setup/accounts\",\"/setup/role\",\"/setup/parts\",\"/dashboard/newinspection\",\"/setup/inspectionlogic\",\"/setup/methods\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/type\",\"/setup/inspectionitem\"]', '[\"extruding\",\"press\",\"outgoing\",\"kneading\"]'),
-(10, 'Administrator', '/dashboard/newinspection', '[\"/setup/role\",\"/setup/accounts\",\"/dashboard/newinspection\",\"/setup/parts\",\"/setup/inspectionlogic\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/methods\",\"/setup/inspectionitem\",\"/setup/type\"]', '[\"kneading\",\"extruding\",\"press\",\"outgoing\"]');
+(10, 'Administrator', '/dashboard/newinspection', '[\"/setup/role\",\"/setup/accounts\",\"/dashboard/newinspection\",\"/setup/parts\",\"/setup/inspectionlogic\",\"/dashboard/nginspection\",\"/dashboard/finishinspection\",\"/dashboard/approval\",\"/setup/methods\",\"/setup/inspectionitem\",\"/setup/type\"]', '[\"kneading\",\"extruding\",\"press\",\"outgoing\"]'),
+(14, 'test', '/dashboard/newinspection', '[\"kneading\",\"/dashboard/newinspection\"]', '');
 
 -- --------------------------------------------------------
 
@@ -213,10 +214,10 @@ CREATE TABLE `t_types` (
   `pressOn` tinyint(1) NOT NULL,
   `outGoingOn` tinyint(1) NOT NULL,
   `heaterOn` tinyint(1) NOT NULL,
-  `kneadingItems` longtext NOT NULL DEFAULT '[]',
-  `extrudingItems` longtext NOT NULL DEFAULT '[]',
-  `pressItems` longtext NOT NULL DEFAULT '[]',
-  `outgoingItems` longtext NOT NULL DEFAULT '[]'
+  `kneadingItems` longtext NOT NULL,
+  `extrudingItems` longtext NOT NULL,
+  `pressItems` longtext NOT NULL,
+  `outgoingItems` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -347,7 +348,7 @@ ALTER TABLE `t_part`
 -- AUTO_INCREMENT untuk tabel `t_role`
 --
 ALTER TABLE `t_role`
-  MODIFY `roleId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `roleId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_types`
