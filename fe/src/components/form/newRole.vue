@@ -43,7 +43,7 @@ const props = defineProps(["closeDialog"]);
 const formData = reactive({
   roleName: "",
   homePage: "",
-  akses: [],
+  akses: ["kneading"],
 });
 
 const structure = [

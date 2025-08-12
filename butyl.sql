@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 11 Agu 2025 pada 18.05
+-- Waktu pembuatan: 12 Agu 2025 pada 04.57
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -186,7 +186,7 @@ CREATE TABLE `t_role` (
   `roleName` varchar(255) NOT NULL,
   `homePage` varchar(255) NOT NULL,
   `akses` longtext NOT NULL,
-  `inspectionAccess` longtext NOT NULL DEFAULT '[]'
+  `inspectionAccess` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
