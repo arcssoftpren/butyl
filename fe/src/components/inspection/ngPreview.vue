@@ -57,7 +57,12 @@
             <div v-if="row.appKey == 'color'">
               {{ row.standard[0] }}
             </div>
-            <div v-else>can be peeled off from Release paper</div>
+            <div v-if="row.appKey == 'peel'">
+              can be peeled off from Release paper
+            </div>
+            <div v-if="row.appKey == 'heaterTemp'">
+              {{ store.checkLogic(2, row.standard, "", true) }} °C
+            </div>
           </div>
 
           <div v-if="localData2.partData.extrudingType == 'b'">
@@ -83,13 +88,14 @@
               {{ row.standard[0] }} Hole(s)
             </div>
             <div v-if="row.appKey == 'heaterTemp'">
-              Check temperature at beginning of production
+              {{ store.checkLogic(2, row.standard, "", true) }} °C
             </div>
           </div>
         </td>
         <td v-if="row.process == 'appearance'">
           <div v-if="localData2.partData.extrudingType == 'a'">
-            Not Confirmed
+            <div v-if="row.appKey == 'heaterTemp'">{{ row.input }} °C</div>
+            <div v-else>Not Confirmed</div>
           </div>
           <div v-else>
             <div
@@ -99,7 +105,6 @@
                   'holeB',
                   'holeC',
                   'holeD',
-                  'heaterTemp',
                   'sheetLayout',
                   'holeCount',
                 ].includes(row.appKey)
@@ -107,6 +112,8 @@
             >
               Not Confirmed
             </div>
+
+            <div v-if="row.appKey == 'heaterTemp'">{{ row.input }} °C</div>
             <div
               v-if="row.input != '' && ['upper', 'bottom'].includes(row.appKey)"
             >

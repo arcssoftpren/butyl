@@ -39,14 +39,24 @@
             <v-divider></v-divider>
             Extruding Lot: {{ item.extrudingLot }}
           </td>
-          <td class="text-end">
+          <td class="text-center">
             {{ item.prodQty }}
           </td>
-          <td class="text-center text-capitalize">
-            {{ item.inspectionStep.step }} | N{{ item.inspectionStep.n }}
+
+          <td class="text-center">
+            <v-btn
+              prepend-icon="mdi-pencil"
+              @click="openDialog('edit', item)"
+              variant="outlined"
+              density="compact"
+              rounded="pill"
+            >
+              edit
+            </v-btn>
           </td>
           <td class="text-center">
             <v-btn
+              color="primary"
               density="compact"
               variant="outlined"
               rounded="pill"
@@ -71,8 +81,8 @@
             Order Number
           </th>
           <th>Lot Number</th>
-          <th class="text-end">Qty.</th>
-          <th class="text-center">Current Check</th>
+          <th class="text-center">Qty.</th>
+          <th class="text-center">Header</th>
           <th class="text-center">Action</th>
         </tr>
       </template>
@@ -96,13 +106,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
-        <template #title>INSPECTION REVIEW</template>
-        <template #subtitle
-          >Please review the inspection data before approval</template
-        >
+
+        <template #title>{{ dialogData.title }}</template>
+        <template #subtitle>{{ dialogData.subtitle }}</template>
         <template #text>
           <!-- content -->
-          <div style="height: 400px; overflow-y: scroll" class="pa-5">
+          <div class="pa-5" v-if="dialogData.key == 'open'">
             <div v-for="(item1, index1) in dataArr" :key="index1">
               <div v-if="item1 != 'appearance'">
                 <v-card
@@ -231,6 +240,7 @@
                           >
                             {{ selected[`${item1}Data`].inspector.userName }}
                           </td>
+
                           <td
                             :class="
                               selected[`${item1}Data`].judgement == 'OK' ||
@@ -836,10 +846,24 @@
               </div>
             </div>
           </div>
-          <v-divider class="my-2"></v-divider>
-          <v-btn @click="approve" variant="outlined" rounded="pill" block
-            >Approve</v-btn
+
+          <div
+            v-if="dialogData.key == 'edit'"
+            class="d-flex w-100 h-100 align-center flex-column pt-5"
           >
+            <editHeader
+              :header-data="selected.headerData"
+              :ins-id="selected.insId"
+              @refresh="refresh"
+            ></editHeader>
+          </div>
+
+          <div v-if="dialogData.key == 'open'">
+            <v-divider class="my-2"></v-divider>
+            <v-btn @click="approve" variant="outlined" rounded="pill" block
+              >Approve</v-btn
+            >
+          </div>
         </template>
       </v-card>
     </v-dialog>
@@ -870,10 +894,17 @@ const dialogData = reactive({
 const dataArr = ["kneading", "appearance", "extruding", "press", "outgoing"];
 
 const openDialog = async (key, item) => {
+  dialogData.key = key;
   switch (key) {
-    case "new":
+    case "edit":
+      dialogData.title = "Edit Inspection Header";
+      dialogData.subtitle = "Please fill all required data.";
+      selected.value = item;
       break;
     case "open":
+      dialogData.title = "INSPECTION REVIEW";
+      dialogData.subtitle =
+        "Please review the inspection data before approval.";
       let data = {
         ...item.insData,
         headerData: item.headerData,

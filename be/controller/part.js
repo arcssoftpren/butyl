@@ -183,45 +183,50 @@ module.exports = {
       await db2.update("t_part", data);
 
       if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(200).send("No files were uploaded.");
+        return res.status(200).json(data);
+      } else {
+        const uploadedFile = req.files.partDrawing;
+        const uploadedFile2 = req.files.actImage;
+        const filePath = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_drawing.png`
+        );
+
+        const filePath2 = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_actual.png`
+        );
+
+        if (uploadedFile) {
+          uploadedFile.mv(filePath, function (err) {
+            if (err) {
+              throw {
+                title: "Upload Error",
+                text: "the file is not uploaded, please try again!",
+                icon: "error",
+                timer: 3000,
+              };
+            }
+          });
+        }
+
+        if (uploadedFile2) {
+          uploadedFile2.mv(filePath2, function (err2) {
+            if (err2) {
+              throw {
+                title: "Upload Error",
+                text: "the file is not uploaded, please try again!",
+                icon: "error",
+                timer: 3000,
+              };
+            }
+          });
+        }
+
+        return res.status(200).json(data);
       }
-
-      const uploadedFile = req.files.partDrawing;
-      const uploadedFile2 = req.files.actImage;
-      const filePath = path.join(
-        __dirname,
-        "../uploads/drawings/",
-        `${partNumber}_drawing.png`
-      );
-
-      const filePath2 = path.join(
-        __dirname,
-        "../uploads/drawings/",
-        `${partNumber}_actual.png`
-      );
-
-      uploadedFile.mv(filePath, function (err) {
-        if (err) {
-          throw {
-            title: "Upload Error",
-            text: "the file is not uploaded, please try again!",
-            icon: "error",
-            timer: 3000,
-          };
-        }
-      });
-
-      uploadedFile2.mv(filePath2, function (err2) {
-        if (err2) {
-          throw {
-            title: "Upload Error",
-            text: "the file is not uploaded, please try again!",
-            icon: "error",
-            timer: 3000,
-          };
-        }
-        return res.status(200).json({ message: "success" });
-      });
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);
@@ -283,6 +288,14 @@ module.exports = {
       console.log(error);
       return res.status(400).json(error);
     }
+  },
+  editInstHeader: async (req, res) => {
+    const data = req.body;
+    const { insId, headerData } = data;
+    const db = new Crud();
+    db.where("insId", "=", insId);
+    await db.update("t_inspection", { headerData: JSON.stringify(headerData) });
+    return res.status(200).json({});
   },
 
   deleteMethode: async (req, res) => {

@@ -56,6 +56,18 @@
           <td class="text-center text-capitalize">
             {{ item.inspectionStep.step }} | N{{ item.inspectionStep.n }}
           </td>
+
+          <td class="text-center">
+            <v-btn
+              prepend-icon="mdi-pencil"
+              @click="openDialog('edit', item)"
+              variant="outlined"
+              density="compact"
+              rounded="pill"
+            >
+              edit
+            </v-btn>
+          </td>
           <td class="text-center">
             <v-btn
               :disabled="
@@ -63,6 +75,7 @@
                   item.inspectionStep.step
                 )
               "
+              color="primary"
               density="compact"
               variant="outlined"
               rounded="pill"
@@ -71,8 +84,6 @@
               >Check</v-btn
             >
           </td>
-
-          <td class="text-center">Edit Header</td>
         </tr>
       </template>
       <template #headers>
@@ -91,8 +102,8 @@
           <th>Lot Number</th>
           <th class="text-end">Qty.</th>
           <th class="text-center">Current Check</th>
+          <th class="text-center">Header</th>
           <th class="text-center">Action</th>
-          <th class="text-center">Edit Header</th>
         </tr>
       </template>
     </v-data-table>
@@ -138,6 +149,16 @@
                 :refresh="refresh"
                 v-else
               ></inspectionStep>
+            </div>
+            <div
+              v-if="dialogData.key == 'edit'"
+              class="d-flex w-100 h-100 align-center flex-column pt-5"
+            >
+              <editHeader
+                :header-data="selected.headerData"
+                :ins-id="selected.insId"
+                @refresh="refresh"
+              ></editHeader>
             </div>
           </div>
         </template>
@@ -205,9 +226,11 @@ const openDialog = (key, item) => {
       }
 
       break;
-    case "delete":
+    case "edit":
+      dialogData.title = "Edit Inspection Header";
+      dialogData.subtitle = "Please fill all required data.";
       selected.value = item;
-      return;
+      break;
   }
   dialog.value = true;
 };

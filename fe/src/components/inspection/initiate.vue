@@ -86,7 +86,7 @@
                             <th>
                               SG:
                               {{
-                                parseFloat(inspection.partData.sg).toFixed(0)
+                                parseFloat(inspection.partData.sg).toFixed(1)
                               }}
                             </th>
                           </tr>

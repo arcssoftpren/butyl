@@ -13,6 +13,7 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppPreload: typeof import('./src/components/misc/appPreload.vue')['default']
     AppTools: typeof import('./src/components/misc/appTools.vue')['default']
+    EditHeader: typeof import('./src/components/form/editHeader.vue')['default']
     EditInsItem: typeof import('./src/components/form/editInsItem.vue')['default']
     EditInstItem: typeof import('./src/components/form/editInstItem.vue')['default']
     EditPart: typeof import('./src/components/form/editPart.vue')['default']
