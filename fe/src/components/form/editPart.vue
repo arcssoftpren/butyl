@@ -1902,7 +1902,12 @@
           <v-col cols="12">
             <v-divider></v-divider>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
+            <v-btn @click="step--" variant="outlined" rounded="pill" block
+              >Back</v-btn
+            >
+          </v-col>
+          <v-col cols="6">
             <v-btn @click="submit" variant="outlined" rounded="pill" block
               >Create Part</v-btn
             >

@@ -58,35 +58,41 @@
         label="Heater Temperature (Check temperature at beginning of production)"
       >
         <template #append-inner> °C </template>
+        <template #append>Standard: 45 ~ 80 °C </template>
       </v-text-field>
     </div>
     <div v-if="inspection.partData.extrudingType == 'c'">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-card title="Images">
             <template #text>
-              <div
-                class="d-flex align-center justify-center w-100 flex-column"
-                style="height: 380px"
-              >
+              <div class="d-flex align-center justify-center w-100 flex-column">
                 <v-img
-                  width="40%"
+                  width="100%"
                   :src="drw == null ? defDrawing : drw"
                 ></v-img>
                 <v-divider class="my-2"></v-divider>
                 <v-img
-                  width="40%"
+                  width="100%"
                   :src="drw == null ? defDrawing : drw"
                 ></v-img>
               </div>
             </template>
           </v-card>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="8">
           <table class="mytable">
             <thead>
               <tr>
-                <th class="text-start">Sheet Layout</th>
+                <th class="text-start">
+                  Sheet Layout
+                  <br />
+                  <hr />
+                  <br />
+                  Standard:
+                  <br />
+                  {{ inspection.appearanceData.standard.sheetLayout }} pcs/sheet
+                </th>
                 <th class="text-start">
                   <v-checkbox-btn
                     false-value=""
@@ -102,7 +108,17 @@
                 </th>
               </tr>
               <tr>
-                <th class="text-start" rowspan="6">Upper Surface</th>
+                <th class="text-start" rowspan="6">
+                  Upper Surface
+                  <br />
+                  <hr />
+                  <br />
+                  Standard:
+                  <br />
+                  {{
+                    store.extBlabel[inspection.appearanceData.standard.upper]
+                  }}
+                </th>
                 <th class="text-start">
                   <v-checkbox-btn
                     false-value=""
@@ -201,7 +217,17 @@
                 </th>
               </tr>
               <tr>
-                <th class="text-start">Bottom Surface</th>
+                <th class="text-start">
+                  Bottom Layout
+                  <br />
+                  <hr />
+                  <br />
+                  Standard:
+                  <br />
+                  {{
+                    store.extBlabel[inspection.appearanceData.standard.bottom]
+                  }}
+                </th>
                 <th>
                   <v-checkbox-btn
                     false-value=""
@@ -230,12 +256,9 @@
         </v-col>
       </v-row>
     </div>
-    <div
-      v-if="inspection.partData.extrudingType == 'b'"
-      style="height: 280px; overflow-y: scroll"
-    >
+    <div v-if="inspection.partData.extrudingType == 'b'">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-card title="Images">
             <template #text>
               <div class="d-flex align-center justify-center w-100 flex-column">
@@ -252,11 +275,19 @@
             </template>
           </v-card>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="8">
           <table class="mytable">
             <thead>
               <tr>
-                <th class="text-start">Sheet Layout</th>
+                <th class="text-start">
+                  Sheet Layout
+                  <br />
+                  <hr />
+                  <br />
+                  Standard:
+                  <br />
+                  {{ inspection.appearanceData.standard.sheetLayout }} pcs/sheet
+                </th>
                 <th class="text-start">
                   <v-checkbox-btn
                     false-value=""
@@ -272,7 +303,16 @@
                 </th>
               </tr>
               <tr>
-                <th class="text-start" rowspan="6">Upper Surface</th>
+                <th class="text-start" rowspan="6">
+                  Upper Surface
+                  <br />
+                  <hr />
+                  <br />
+                  Standard: <br />
+                  {{
+                    store.extBlabel[inspection.appearanceData.standard.upper]
+                  }}
+                </th>
               </tr>
               <tr v-for="(item, index) in store.extBlabel" :key="index">
                 <th>
@@ -289,7 +329,14 @@
                 </th>
               </tr>
               <tr>
-                <th class="text-start">Bottom Surface</th>
+                <th class="text-start">
+                  Bottom Surface
+                  <hr />
+                  <br />
+                  Standard:
+                  <br />
+                  {{ inspection.appearanceData.standard.bottom }} pcs/sheet
+                </th>
                 <th>
                   <v-checkbox-btn
                     false-value=""
@@ -345,6 +392,10 @@
                 <td colspan="2"></td>
               </tr>
               <tr>
+                <th>Item Inspection</th>
+                <th>Standard</th>
+              </tr>
+              <tr>
                 <th>
                   <v-checkbox-btn
                     false-value=""
@@ -354,6 +405,11 @@
                     :true-value="inspection.appearanceData.standard.color"
                   ></v-checkbox-btn>
                 </th>
+                <th class="text-capitalize text-center">
+                  {{ inspection.appearanceData.standard.color }}
+                </th>
+              </tr>
+              <tr>
                 <th>
                   <v-checkbox-btn
                     false-value=""
@@ -363,6 +419,10 @@
                     :true-value="inspection.appearanceData.standard.peel"
                   >
                   </v-checkbox-btn>
+                </th>
+
+                <th class="text-capitalize text-center">
+                  Butyl tape can be peeled off from Release paper
                 </th>
               </tr>
             </thead>
@@ -379,7 +439,7 @@
   </div>
   <div v-else>
     <v-divider class="my-5"></v-divider>
-    <div style="height: 255px; overflow-y: scroll">
+    <div>
       <v-table class="mytable">
         <thead>
           <tr>
@@ -551,6 +611,7 @@ onBeforeMount(async () => {
     });
 
     if (inspection.partData.heaterCheck) {
+      inspection.appearanceData.standard.heaterTemp = [45, 80];
       inspection.appearanceData.data.heaterTemp = {
         input: "",
         judgement: false,
@@ -582,8 +643,11 @@ function validateAppearance() {
   });
 
   if (inspection.partData.heaterCheck) {
-    inspection.appearanceData.data.heaterTemp.judgement =
-      inspection.appearanceData.data.heaterTemp.input != "";
+    inspection.appearanceData.data.heaterTemp.judgement = store.checkLogic(
+      2,
+      inspection.appearanceData.standard.heaterTemp,
+      inspection.appearanceData.data.heaterTemp.input
+    );
   }
 
   let valid = Object.entries(inspection.appearanceData.data).every(
@@ -591,7 +655,6 @@ function validateAppearance() {
   );
 
   appearanceValid.value = valid;
-  inspection.appearanceData.judgement = valid ? 1 : 0;
   inspection.judgement = valid ? null : 0;
 
   const step = inspection.inspectionStep.step;
@@ -605,13 +668,18 @@ function validateAppearance() {
       label: store.extLabel[e[0]],
       judgement: e[1].judgement,
       input: e[1].input,
-      standard: [inspection.appearanceData.standard[e[0]]],
+      standard:
+        e[0] != "heaterTemp"
+          ? [inspection.appearanceData.standard[e[0]]]
+          : [45, 80],
       logic: { id: 8 },
       appKey: e[0],
     };
   });
 
   inspection.rejectionData.data[step] = rejectionData;
+
+  console.log(rejectionData);
 }
 
 function validateInput(index, Yindex) {

@@ -71,6 +71,8 @@
               >Check</v-btn
             >
           </td>
+
+          <td class="text-center">Edit Header</td>
         </tr>
       </template>
       <template #headers>
@@ -90,6 +92,7 @@
           <th class="text-end">Qty.</th>
           <th class="text-center">Current Check</th>
           <th class="text-center">Action</th>
+          <th class="text-center">Edit Header</th>
         </tr>
       </template>
     </v-data-table>
@@ -188,15 +191,15 @@ const openDialog = (key, item) => {
           dialogData.subtitle = "Please fill all required data.";
           break;
         case "extruding":
-          dialogData.title = "Kneading inspection";
+          dialogData.title = "Extruding Inspection";
           dialogData.subtitle = "Please fill all required data.";
           break;
         case "press":
-          dialogData.title = "Kneading inspection";
+          dialogData.title = "Press Inspection";
           dialogData.subtitle = "Please fill all required data.";
           break;
         case "outgoing":
-          dialogData.title = "Kneading inspection";
+          dialogData.title = "Outgoing inspection";
           dialogData.subtitle = "Please fill all required data.";
           break;
       }

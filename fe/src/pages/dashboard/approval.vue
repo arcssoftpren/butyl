@@ -22,12 +22,28 @@
           <td class="text-center" :key="item.partNumber">{{ index + 1 }}</td>
           <td :key="item.poNumber">
             {{ item.poNumber }}
-          </td>
-          <td :key="item.partNumber">
+            <v-divider></v-divider>
             {{ item.partNumber }}
+          </td>
+          <td :key="item.deliveryDate">
+            {{
+              item.deliveryDate != ""
+                ? moment(item.deliveryDate).format("DD/MM/YYYY")
+                : "-"
+            }}
+            <v-divider></v-divider>
+            {{ item.orderNumber }}
+          </td>
+          <td>
+            Kneading Lot: {{ item.kneadingLot }}
+            <v-divider></v-divider>
+            Extruding Lot: {{ item.extrudingLot }}
           </td>
           <td class="text-end">
             {{ item.prodQty }}
+          </td>
+          <td class="text-center text-capitalize">
+            {{ item.inspectionStep.step }} | N{{ item.inspectionStep.n }}
           </td>
           <td class="text-center">
             <v-btn
@@ -36,7 +52,7 @@
               rounded="pill"
               block
               @click="openDialog('open', item)"
-              >Check</v-btn
+              >Review</v-btn
             >
           </td>
         </tr>
@@ -44,10 +60,20 @@
       <template #headers>
         <tr>
           <th class="text-center">No</th>
-          <th>PO Number</th>
-          <th>Part Number</th>
+          <th>
+            PO Number <br />
+            <v-divider></v-divider>
+            Part Number
+          </th>
+          <th>
+            Delivery Date <br />
+            <v-divider></v-divider>
+            Order Number
+          </th>
+          <th>Lot Number</th>
           <th class="text-end">Qty.</th>
-          <th class="text-center">Review</th>
+          <th class="text-center">Current Check</th>
+          <th class="text-center">Action</th>
         </tr>
       </template>
     </v-data-table>

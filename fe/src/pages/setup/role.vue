@@ -5,8 +5,6 @@
       max-height="60vh"
       :search="search"
       :items="roles"
-      :items-per-page-options="[]"
-      items-per-page="4"
     >
       <template #top>
         <v-toolbar color="transparent">
@@ -200,7 +198,7 @@ const refresh = async () => {
 
     roles.value = await store.ajax({}, "/auth/getroles", "post");
 
-    roles.value = roles.value.filter((role) => role.roleId != 1);
+    // roles.value = roles.value.filter((role) => role.roleId != 1);
     roles.value = await Promise.all(
       roles.value.map((role) => {
         role.akses = JSON.parse(role.akses);
