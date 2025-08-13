@@ -41,44 +41,49 @@ module.exports = {
 
       if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(200).json(data);
-      }
+      } else {
+        const uploadedFile = req.files.partDrawing;
+        const uploadedFile2 = req.files.actImage;
+        const filePath = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_drawing.png`
+        );
 
-      const uploadedFile = req.files.partDrawing;
-      const uploadedFile2 = req.files.actImage;
-      const filePath = path.join(
-        __dirname,
-        "../uploads/drawings/",
-        `${partNumber}_drawing.png`
-      );
+        const filePath2 = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_actual.png`
+        );
 
-      const filePath2 = path.join(
-        __dirname,
-        "../uploads/drawings/",
-        `${partNumber}_actual.png`
-      );
-
-      uploadedFile.mv(filePath, function (err) {
-        if (err) {
-          throw {
-            title: "Upload Error",
-            text: "the file is not uploaded, please try again!",
-            icon: "error",
-            timer: 3000,
-          };
+        if (uploadedFile) {
+          uploadedFile.mv(filePath, function (err) {
+            if (err) {
+              throw {
+                title: "Upload Error",
+                text: "the file is not uploaded, please try again!",
+                icon: "error",
+                timer: 3000,
+              };
+            }
+          });
         }
-      });
 
-      uploadedFile2.mv(filePath2, function (err2) {
-        if (err2) {
-          throw {
-            title: "Upload Error",
-            text: "the file is not uploaded, please try again!",
-            icon: "error",
-            timer: 3000,
-          };
+        if (uploadedFile2) {
+          uploadedFile2.mv(filePath2, function (err2) {
+            if (err2) {
+              throw {
+                title: "Upload Error",
+                text: "the file is not uploaded, please try again!",
+                icon: "error",
+                timer: 3000,
+              };
+            }
+          });
         }
+
         return res.status(200).json(data);
-      });
+      }
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);
@@ -114,29 +119,44 @@ module.exports = {
       const filePath = `./uploads/drawings/${partNumber}_drawing.png`;
       const filePath2 = `./uploads/drawings/${partNumber}_actual.png`;
 
-      let fileData;
+      const drawingExists = fs.existsSync(filePath);
+      const actExists = fs.existsSync(filePath2);
+
+      let fileData = {
+        act: null,
+        drw: null,
+      };
+
+      let act = null;
+      let drw = null;
 
       try {
-        fileData = {
-          act: await fs.promises.readFile(filePath2),
-          drw: await fs.promises.readFile(filePath),
-        };
+        if (actExists) {
+          fileData.act = await fs.promises.readFile(filePath2);
+          const mimeType2 =
+            mime.lookup(filePath2) || "application/octet-stream";
+          const base642 = fileData.act.toString("base64");
+          act = `data:${mimeType2};base64,${base642}`;
+        }
+
+        if (drawingExists) {
+          fileData.drw = await fs.promises.readFile(filePath);
+          const mimeType1 = mime.lookup(filePath) || "application/octet-stream";
+          const base641 = fileData.drw.toString("base64");
+          drw = `data:${mimeType1};base64,${base641}`;
+        }
       } catch (err) {
+        console.log(err);
         return res.status(200).json({
           title: "File Not Found",
           text: "There is no signature file related to the account, please add new file.",
           icon: "info",
         });
       }
-      const mimeType1 = mime.lookup(filePath) || "application/octet-stream";
-      const mimeType2 = mime.lookup(filePath2) || "application/octet-stream";
-      const base641 = fileData.drw.toString("base64");
-      const base642 = fileData.act.toString("base64");
-      const drw = `data:${mimeType1};base64,${base641}`;
-      const act = `data:${mimeType2};base64,${base642}`;
 
       return res.status(200).json({ drw, act });
     } catch (error) {
+      console.log(error);
       return res.status(400).json(error);
     }
   },
