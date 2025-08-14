@@ -185,7 +185,7 @@ const headers = ref([
     align: "center",
   },
   {
-    title: "WP Type Name",
+    title: "WIP Type Name",
     key: "typeNumber",
     align: "center",
   },
@@ -222,12 +222,12 @@ const openDialog = (key, item) => {
   dialogData.key = key;
   switch (key) {
     case "new":
-      dialogData.title = "Create a New WP Type";
+      dialogData.title = "Create a New WIP Type";
       dialogData.subtitle = "Please fill all required data below";
       break;
     case "edit":
       selected.value = item;
-      dialogData.title = "Edit WP Type";
+      dialogData.title = "Edit WIP Type";
       dialogData.subtitle = "Please fill all required data below";
       break;
   }

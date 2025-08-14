@@ -33,8 +33,8 @@
         <tr>
           <th class="text-center">No</th>
           <th>
-            Part Name <br />
-            <small>Part Number</small>
+            Part Number <br />
+            <small>Part Name</small>
           </th>
           <th>Customer</th>
           <th class="text-center">Actions</th>
@@ -44,9 +44,9 @@
         <tr class="text-uppercase">
           <td class="text-center">{{ index + 1 }}</td>
           <td class="text-start">
-            <strong>{{ item.partName }}</strong>
+            <strong>{{ item.partNumber }}</strong>
             <div>
-              <small>{{ item.partNumber }}</small>
+              <small>{{ item.partName }}</small>
             </div>
           </td>
           <td>

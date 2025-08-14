@@ -17,13 +17,12 @@
           </template>
           <template #append>
             <v-btn
+              rounded="pill"
               @click="openDialog('new')"
-              density="compact"
               variant="outlined"
-              icon
               class="mt-2 ms-2"
             >
-              <v-icon>mdi-plus</v-icon>
+              New Inspection
             </v-btn>
           </template>
         </v-toolbar>

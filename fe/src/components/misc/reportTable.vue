@@ -1,8 +1,5 @@
 <template>
   <tbody class="processItem">
-    <tr>
-      <td colspan="16"></td>
-    </tr>
     <tr v-if="process == 'extruding' && heaterOn == 1">
       <td
         :rowspan="dataSet.insItem.length + 3"
@@ -214,7 +211,11 @@
               </tbody>
             </table>
           </v-col>
-          <v-col class="text-error" cols="12">
+          <v-col
+            class="text-error"
+            cols="12"
+            v-if="partType == 1 || partType == 2"
+          >
             Note : Check release paper every change a new release paper
           </v-col>
         </v-row>
@@ -318,6 +319,7 @@ import defDrawing from "@/assets/defaultDesign.png";
 import noImage from "@/assets/noImage.webp";
 
 const props = defineProps([
+  "partType",
   "dataSet",
   "process",
   "heaterOn",
@@ -364,7 +366,6 @@ const getJudgement = (id, index) => {
       r.push(element.items[index].judgement);
     }
   });
-  console.log(r);
   return r.every((e) => e == 1);
 };
 

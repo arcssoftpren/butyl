@@ -101,17 +101,11 @@ export const useAppStore = defineStore("app", {
         video: "itemSetup.mp4",
       },
       {
-        title: "WP Type Setup",
+        title: "WIP Type Setup",
         subtitle: "Manage your type data here.",
         icon: "mdi-shape",
         path: "/setup/type",
         video: "typeSetup.mp4",
-      },
-      {
-        title: "Parts Setup",
-        subtitle: "Manage your parts data here.",
-        icon: "mdi-cube",
-        path: "/setup/parts",
       },
       {
         title: "Inspection Logic",
@@ -128,7 +122,7 @@ export const useAppStore = defineStore("app", {
     ],
     menus: [
       {
-        title: "New Inspection",
+        title: "New Inspection Page",
         subtitle: "Generate and run a new inspection.",
         icon: "mdi-ruler",
         path: "/dashboard/newinspection",
@@ -146,10 +140,17 @@ export const useAppStore = defineStore("app", {
         path: "/dashboard/approval",
       },
       {
-        title: "Finished Inspection",
+        title: "Finished Inspection Page",
         subtitle: "review rejected inspections.",
         icon: "mdi-check",
         path: "/dashboard/finishinspection",
+      },
+
+      {
+        title: "Parts Registration",
+        subtitle: "Manage your parts data here.",
+        icon: "mdi-cube",
+        path: "/setup/parts",
       },
     ],
     insAccess: ["kneading", "appearance", "extruding", "press", "outgoing"],

@@ -46,21 +46,6 @@
   </table>
   <div v-if="inspection.inspectionStep.step == 'appearance'">
     <v-divider class="my-2"></v-divider>
-    <div class="my-2" v-if="inspection.partData.heaterCheck">
-      <v-text-field
-        @keyup="validateAppearance"
-        type="number"
-        variant="outlined"
-        rounded="pill"
-        density="compact"
-        hide-details=""
-        v-model="inspection.appearanceData.data.heaterTemp.input"
-        label="Heater Temperature (Check temperature at beginning of production)"
-      >
-        <template #append-inner> °C </template>
-        <template #append>Standard: 45 ~ 80 °C </template>
-      </v-text-field>
-    </div>
     <div v-if="inspection.partData.extrudingType == 'c'">
       <v-row>
         <v-col cols="4">
@@ -74,7 +59,7 @@
                 <v-divider class="my-2"></v-divider>
                 <v-img
                   width="100%"
-                  :src="drw == null ? defDrawing : drw"
+                  :src="act == null ? defDrawing : act"
                 ></v-img>
               </div>
             </template>
@@ -83,6 +68,30 @@
         <v-col cols="8">
           <table class="mytable">
             <thead>
+              <tr v-if="inspection.partData.heaterCheck">
+                <th class="text-start">
+                  Heater Temperature
+                  <br />
+                  <hr />
+                  <br />Standard: <br />
+                  45 ~ 80 °C
+                </th>
+                <th class="text-start">
+                  <v-text-field
+                    class="mx-5"
+                    @keyup="validateAppearance"
+                    type="number"
+                    variant="outlined"
+                    rounded="pill"
+                    density="compact"
+                    hide-details=""
+                    v-model="inspection.appearanceData.data.heaterTemp.input"
+                    label="Heater Temperature (Check temperature at beginning of production)"
+                  >
+                    <template #append-inner> °C </template>
+                  </v-text-field>
+                </th>
+              </tr>
               <tr>
                 <th class="text-start">
                   Sheet Layout
@@ -269,7 +278,7 @@
                 <v-divider class="my-2"></v-divider>
                 <v-img
                   width="220"
-                  :src="drw == null ? defDrawing : drw"
+                  :src="act == null ? defDrawing : act"
                 ></v-img>
               </div>
             </template>
@@ -278,6 +287,30 @@
         <v-col cols="8">
           <table class="mytable">
             <thead>
+              <tr v-if="inspection.partData.heaterCheck">
+                <th class="text-start">
+                  Heater Temperature
+                  <br />
+                  <hr />
+                  <br />Standard: <br />
+                  45 ~ 80 °C
+                </th>
+                <th class="text-start">
+                  <v-text-field
+                    class="mx-5"
+                    @keyup="validateAppearance"
+                    type="number"
+                    variant="outlined"
+                    rounded="pill"
+                    density="compact"
+                    hide-details=""
+                    v-model="inspection.appearanceData.data.heaterTemp.input"
+                    label="Heater Temperature (Check temperature at beginning of production)"
+                  >
+                    <template #append-inner> °C </template>
+                  </v-text-field>
+                </th>
+              </tr>
               <tr>
                 <th class="text-start">
                   Sheet Layout
@@ -335,7 +368,9 @@
                   <br />
                   Standard:
                   <br />
-                  {{ inspection.appearanceData.standard.bottom }} pcs/sheet
+                  {{
+                    store.extBlabel[inspection.appearanceData.standard.bottom]
+                  }}
                 </th>
                 <th>
                   <v-checkbox-btn
@@ -370,6 +405,30 @@
         <v-col cols="12">
           <table class="mytable">
             <thead>
+              <tr v-if="inspection.partData.heaterCheck">
+                <th class="text-start">
+                  Heater Temperature
+                  <br />
+                  <hr />
+                  <br />Standard: <br />
+                  45 ~ 80 °C
+                </th>
+                <th class="text-start">
+                  <v-text-field
+                    class="mx-5"
+                    @keyup="validateAppearance"
+                    type="number"
+                    variant="outlined"
+                    rounded="pill"
+                    density="compact"
+                    hide-details=""
+                    v-model="inspection.appearanceData.data.heaterTemp.input"
+                    label="Heater Temperature (Check temperature at beginning of production)"
+                  >
+                    <template #append-inner> °C </template>
+                  </v-text-field>
+                </th>
+              </tr>
               <tr>
                 <td>Part Drawing</td>
                 <td>Actual Image</td>
@@ -432,10 +491,14 @@
     </div>
 
     <v-divider class="my-2"></v-divider>
-
-    <v-btn @click="appProceed" variant="outlined" rounded="pill" block
-      >Save</v-btn
-    >
+    <v-btn
+      :color="appearanceValid ? 'success' : 'error'"
+      @click="appProceed"
+      :variant="appearanceValid ? 'outlined' : 'flat'"
+      rounded="pill"
+      block
+      :text="appearanceValid ? 'SAVE' : 'REPORT NG'"
+    ></v-btn>
   </div>
   <div v-else>
     <v-divider class="my-5"></v-divider>
@@ -534,11 +597,12 @@
       </v-col>
       <v-col cols="6">
         <v-btn
+          :color="inspection.currentData.judgement ? 'success' : 'error'"
           :disabled="!next"
-          variant="outlined"
+          :variant="inspection.currentData.judgement ? 'outlined' : 'flat'"
           rounded="pill"
           block
-          text="next"
+          :text="inspection.currentData.judgement ? 'next' : 'Report NG'"
           @click="procceed"
         ></v-btn>
       </v-col>

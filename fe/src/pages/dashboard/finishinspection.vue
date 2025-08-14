@@ -114,7 +114,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td colspan="16" class="text-center text-h6">
+                    <td colspan="16" class="text-center text-h3">
                       PART INSPECTION REPORT
                     </td>
                   </tr>
@@ -214,8 +214,8 @@
                     <td class="text-center" colspan="2">Judgement</td>
                   </tr>
                 </tbody>
-
                 <reportTable
+                  :part-type="selected.insData.partData.partType"
                   :ext-type="selected.insData.partData.extrudingType"
                   :app-data="selected.insData.appearanceData"
                   :length-arr="lengthArr"
@@ -227,6 +227,27 @@
                   v-show="selected.insData[`${process}Data`].insItem.length > 0"
                   :part-number="selected.insData.partData.partNumber"
                 />
+                <tr>
+                  <td style="border: none !important" colspan="17"></td>
+                </tr>
+                <tr>
+                  <td
+                    style="border: none !important"
+                    colspan="16"
+                    rowspan="3"
+                  ></td>
+                  <td class="text-center">Approved By</td>
+                </tr>
+                <tr>
+                  <td class="text-center">
+                    <v-img height="40" :src="approval.picData.sign"></v-img>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-center" style="font-size: 11pt">
+                    {{ approval.picData.userName }}
+                  </td>
+                </tr>
               </table>
             </div>
           </div>
@@ -260,6 +281,7 @@ const dialogData = reactive({
 });
 const zoom = ref(1);
 const lengthArr = ref({});
+const approval = ref({});
 
 const scaling = () => {
   const el = table.value;
@@ -271,11 +293,19 @@ const scaling = () => {
   const scaleX = a4Width / elWidth;
   const scaleY = a4Height / elHeight;
   scale.value = Math.min(scaleX, scaleY);
-
-  console.log(scale.value);
 };
 
 const openDialog = async (key, item) => {
+  store
+    .ajax(
+      { userId: item.insData.approval.picData.userId },
+      "/auth/getsignfile",
+      "post"
+    )
+    .then((e) => {
+      approval.value.picData.sign = e;
+    });
+  approval.value = item.insData.approval;
   const arr = ["kneadingData", "extrudingData", "pressData", "outgoingData"];
   arr.forEach((a, index) => {
     const target = item.insData[a].data;
@@ -323,14 +353,14 @@ const openDialog = async (key, item) => {
     lengthArr.value[processes[index]] = le;
   });
 
-  console.log(lengthArr.value);
-
   selected.value = item;
   store.preload = false;
   dialog.value = true;
   setTimeout(() => {
     scaling();
   }, 100);
+
+  console.log(item);
 };
 
 const refresh = async () => {

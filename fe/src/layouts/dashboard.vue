@@ -42,7 +42,29 @@
         </v-card-text>
       </v-card>
     </v-responsive>
-    <v-navigation-drawer temporary="" v-model="mainDrawer">
+    <v-navigation-drawer
+      temporary=""
+      v-model="mainDrawer"
+      color="grey-lighten-3"
+    >
+      <template #prepend>
+        <v-list>
+          <v-list-item>
+            <v-card class="w-100 my-5" elevation="5">
+              <template #text>
+                <div class="d-flex">
+                  <v-img width="40" src="@/assets/softfren.png"></v-img>
+                  <div class="w-100 ms-2">
+                    <strong class="text-h5">Welcome</strong><br />
+                    <strong>{{ store.userData.userName }}</strong>
+                    <p>{{ store.userData.roleName }}</p>
+                  </div>
+                </div>
+              </template>
+            </v-card>
+          </v-list-item>
+        </v-list>
+      </template>
       <featureMenus
         :key="store.roleUpdate"
         :close-menu="
