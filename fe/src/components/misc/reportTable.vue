@@ -1,12 +1,28 @@
 <template>
   <tbody class="processItem">
-    <tr v-if="process == 'extruding' && heaterOn == 1">
+    <tr v-if="process == 'extruding'">
       <td
+        v-if="heaterOn == 0"
         :rowspan="dataSet.insItem.length + 3"
         class="text-center processTitle"
       >
         {{ process }}
       </td>
+      <td
+        v-if="heaterOn == 1"
+        :rowspan="dataSet.insItem.length + 4"
+        class="text-center processTitle"
+      >
+        {{ process }}
+      </td>
+
+      <td colspan="15" class="text-center noteItem">
+        Sampel akan dikumpulkan dari 5 lokasi untuk setiap lot produk. 5
+        spesimen yang akan diambil sampelnya harus dikumpulkan dari lokasi genap
+        dan pada jarak maksimum.
+      </td>
+    </tr>
+    <tr v-if="process == 'extruding' && heaterOn == 1">
       <td class="text-center">{{ lengthArr[process] - 1 }}</td>
       <td class="text-center">Dies temperature</td>
       <td class="text-center" colspan="4">
@@ -36,13 +52,6 @@
     </tr>
 
     <tr v-if="process == 'extruding'">
-      <td
-        v-if="heaterOn == 0"
-        :rowspan="dataSet.insItem.length + 2"
-        class="text-center processTitle"
-      >
-        {{ process }}
-      </td>
       <td class="text-center" rowspan="2">{{ lengthArr[process] }}</td>
       <td colspan="5" class="font-weight-bold">Appearance Standard</td>
       <td colspan="9" class="font-weight-bold">Result</td>
@@ -123,7 +132,7 @@
               </tbody>
             </table>
             <table class="w-100 mytable" v-if="extType != 'a'">
-              <tbody>
+              <tbody style="font-size: 11pt">
                 <tr>
                   <td class="text-center" colspan="3">Sheet Layout</td>
                 </tr>
@@ -221,6 +230,24 @@
         </v-row>
       </td>
     </tr>
+    <tr v-if="process == 'outgoing'">
+      <td
+        :rowspan="
+          roomCheck != 1
+            ? dataSet.insItem.length + 1
+            : dataSet.insItem.length + 2
+        "
+        class="text-center processTitle"
+      >
+        {{ process }}
+      </td>
+      <td colspan="15" class="text-center noteItem">
+        “Sampel akan dikumpulkan dari 5 lokasi untuk setiap lot produk. 5
+        spesimen yang akan diambil sampelnya harus dikumpulkan dari lokasi genap
+        dan pada jarak maksimum. Jangan mencampur 5 sampel yang dikumpulkan, dan
+        lakukan pengujian berikut secara terpisah"
+      </td>
+    </tr>
     <tr v-for="(item, index) in dataSet.insItem" :key="index">
       <td
         v-if="index == 0 && process != 'extruding' && process != 'outgoing'"
@@ -230,15 +257,6 @@
         {{ process }}
       </td>
 
-      <td
-        v-if="index == 0 && process == 'outgoing'"
-        :rowspan="
-          roomCheck != 1 ? dataSet.insItem.length : dataSet.insItem.length + 1
-        "
-        class="text-center processTitle"
-      >
-        {{ process }}
-      </td>
       <td class="text-center">{{ lengthArr[process] + index + 1 }}</td>
 
       <td class="text-center text-no-wrap">{{ item.label }}</td>
@@ -395,3 +413,9 @@ onBeforeMount(() => {
   refresh();
 });
 </script>
+
+<style scoped>
+.noteItem {
+  font-size: 9pt !important;
+}
+</style>

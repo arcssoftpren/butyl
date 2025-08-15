@@ -451,6 +451,9 @@
                           hide-details=""
                           hide-spin-buttons=""
                           v-model="item.sampleQ"
+                          @input="
+                            item.sampleQ = Math.min(Number(item.sampleQ), 5)
+                          "
                           width="50"
                         >
                         </v-text-field>
@@ -750,6 +753,9 @@
                           hide-details=""
                           hide-spin-buttons=""
                           v-model="item.sampleQ"
+                          @input="
+                            item.sampleQ = Math.min(Number(item.sampleQ), 5)
+                          "
                           width="50"
                         >
                         </v-text-field>
@@ -1241,6 +1247,9 @@
                           hide-details=""
                           hide-spin-buttons=""
                           v-model="item.sampleQ"
+                          @input="
+                            item.sampleQ = Math.min(Number(item.sampleQ), 5)
+                          "
                           width="50"
                         >
                         </v-text-field>
@@ -1539,6 +1548,9 @@
                           hide-details=""
                           hide-spin-buttons=""
                           v-model="item.sampleQ"
+                          @input="
+                            item.sampleQ = Math.min(Number(item.sampleQ), 5)
+                          "
                           width="50"
                         >
                         </v-text-field>

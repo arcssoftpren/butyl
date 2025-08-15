@@ -114,7 +114,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td colspan="16" class="text-center text-h3">
+                    <td colspan="16" class="text-center text-h4">
                       PART INSPECTION REPORT
                     </td>
                   </tr>
