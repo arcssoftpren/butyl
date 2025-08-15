@@ -215,6 +215,7 @@
                   </tr>
                 </tbody>
                 <reportTable
+                  :room-check="selected.insData.partData.roomCheck"
                   :part-type="selected.insData.partData.partType"
                   :ext-type="selected.insData.partData.extrudingType"
                   :app-data="selected.insData.appearanceData"

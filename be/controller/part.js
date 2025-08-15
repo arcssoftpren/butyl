@@ -8,6 +8,20 @@ const moment = require("moment");
 const { kMaxLength } = require("buffer");
 
 module.exports = {
+  getRoomCheck: async (req, res) => {
+    try {
+      const data = req.body;
+      const { type } = data;
+      const db = new Crud();
+      db.where("id", "=", type);
+      const roomCheck = await db.get("t_types");
+      return res.status(200).json(roomCheck[0]);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+
   getLogics: async (req, res) => {
     const db = new Crud();
     const response = await db.get("inspection_logic");

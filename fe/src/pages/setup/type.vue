@@ -89,6 +89,7 @@
       persistent
       :overlay="false"
       transition="dialog-transition"
+      fullscreen=""
     >
       <v-card>
         <template #title>{{ dialogData.title }}</template>

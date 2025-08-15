@@ -327,6 +327,41 @@
                             </div>
                           </td>
                         </tr>
+                        <tr
+                          v-if="
+                            item1 == 'outgoing' &&
+                            selected.partData.roomCheck == 1
+                          "
+                        >
+                          <td class="text-center">Room Temperature</td>
+                          <td class="text-center">23 &plusmn; 2 °C</td>
+                          <td
+                            colspan="5"
+                            :class="
+                              selected.outgoingData.roomData.judgement
+                                ? 'text-center'
+                                : 'text-error text-center'
+                            "
+                          >
+                            {{ selected.outgoingData.roomData.input }} °C
+                          </td>
+                          <td class="text-center">
+                            {{ selected[`${item1}Data`].inspector.userName }}
+                          </td>
+                          <td
+                            :class="
+                              selected.outgoingData.roomData.judgement
+                                ? 'bg-success text-center'
+                                : 'text-center bg-error'
+                            "
+                          >
+                            {{
+                              selected.outgoingData.roomData.judgement
+                                ? "OK"
+                                : "NG"
+                            }}
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                     <v-divider class="my-2"></v-divider>

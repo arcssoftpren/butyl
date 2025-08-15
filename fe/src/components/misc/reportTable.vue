@@ -223,8 +223,18 @@
     </tr>
     <tr v-for="(item, index) in dataSet.insItem" :key="index">
       <td
-        v-if="index == 0 && process != 'extruding'"
+        v-if="index == 0 && process != 'extruding' && process != 'outgoing'"
         :rowspan="dataSet.insItem.length"
+        class="text-center processTitle"
+      >
+        {{ process }}
+      </td>
+
+      <td
+        v-if="index == 0 && process == 'outgoing'"
+        :rowspan="
+          roomCheck != 1 ? dataSet.insItem.length : dataSet.insItem.length + 1
+        "
         class="text-center processTitle"
       >
         {{ process }}
@@ -310,6 +320,17 @@
         <small>{{ dataSet.inspector.userName }} </small>
       </td>
     </tr>
+    <tr v-if="process == 'outgoing' && roomCheck == 1">
+      <td colspan="2" class="text-center text-no-wrap">Room Temperature</td>
+      <td colspan="4" class="text-center">23 &plusmn; 2 °C</td>
+      <td class="text-center">Thermometer</td>
+      <td class="text-center">n=1</td>
+      <td colspan="5" class="text-center">{{ dataSet.roomData.input }} °C</td>
+      <td class="text-center" colspan="2" v-if="dataSet.roomData.judgement">
+        OK
+      </td>
+      <td class="text-center" colspan="2" v-else>NG</td>
+    </tr>
   </tbody>
 </template>
 <script setup>
@@ -327,6 +348,7 @@ const props = defineProps([
   "appData",
   "extType",
   "partNumber",
+  "roomCheck",
 ]);
 const store = useAppStore();
 

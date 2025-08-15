@@ -54,6 +54,12 @@ export default class Inspection {
       judgement: null,
     };
     this.outgoingData = {
+      roomData: {
+        input: "",
+        standard: [23, 2],
+        logic: 17,
+        judgement: false,
+      },
       insItem: [],
       inspector: null,
       inspectionDate: "",
@@ -211,11 +217,19 @@ export default class Inspection {
     }
   }
 
-  registerPart(part) {
+  async registerPart(part) {
     this.partData = { ...part };
     this.partNumber = part.partNumber;
     this.pressOn = part.pressOn;
     this.outgoingOn = part.outgoingOn;
+
+    let type = this.partData.partType;
+    if (
+      typeof this.partData.roomCheck === "undefined" ||
+      this.partData.roomCheck === null
+    ) {
+      this.partData.roomCheck = await this.getRoomCheck(type);
+    }
 
     part.headers.forEach((key) => {
       if (key == "deliveryDate") {
@@ -281,6 +295,12 @@ export default class Inspection {
     };
 
     this.outgoingData = savedInspection.outgoingData || {
+      roomData: {
+        input: "",
+        standard: [23, 2],
+        logic: 17,
+        judgement: false,
+      },
       inspector: null,
       inspectionDate: "",
       data: [],
@@ -343,5 +363,10 @@ export default class Inspection {
       ins.steps = [...data.data];
       return ins;
     });
+  }
+
+  async getRoomCheck(type) {
+    let roomCheck = await store.ajax({ type }, "/parts/getroomcheck", "post");
+    return roomCheck.roomTemp;
   }
 }

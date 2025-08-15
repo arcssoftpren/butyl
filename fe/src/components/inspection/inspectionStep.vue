@@ -503,6 +503,7 @@
   <div v-else>
     <v-divider class="my-5"></v-divider>
     <div>
+      {{ inspection.rejectionData }}
       <v-table class="mytable">
         <thead>
           <tr>
@@ -529,6 +530,33 @@
           </tr>
         </thead>
         <tbody>
+          <tr
+            v-if="
+              inspection.inspectionStep.step == 'outgoing' &&
+              roomCheck == 1 &&
+              inspection.inspectionStep.n == 1
+            "
+          >
+            <td colspan="2" class="text-center">Room Temperature</td>
+            <td class="text-center">23 &plusmn; 2 &deg;C</td>
+            <td class="text-center">Thermometer</td>
+            <td
+              :class="
+                inspection.outgoingData.roomData.judgement
+                  ? 'bg-success'
+                  : 'bg-error'
+              "
+            >
+              <v-text-field
+                @keyup="validateRoomTemp"
+                variant="outlined"
+                rounded="pill"
+                density="compact"
+                hide-details
+                v-model="inspection.outgoingData.roomData.input"
+              />
+            </td>
+          </tr>
           <tr v-for="(item, Yindex) in tableStructure" :key="Yindex">
             <td class="text-center">{{ Yindex + 1 }}</td>
             <td class="text-center">
@@ -617,7 +645,7 @@ import defDrawing from "@/assets/defaultDesign.png";
 import moment from "moment";
 
 const store = useAppStore();
-const props = defineProps(["inspectionData", "refresh"]);
+const props = defineProps(["inspectionData", "refresh", "roomCheck"]);
 let localizedData = { ...toRaw(props.inspectionData) };
 let inspection = reactive(new Inspection());
 const drw = ref(null);
@@ -628,6 +656,7 @@ let next = ref(false);
 let appearanceValid = ref(false);
 let appEntries = ref([]);
 let stepValid = ref(false);
+let roomValid = ref(false);
 
 onBeforeMount(async () => {
   inspection.registerData(localizedData);
@@ -742,8 +771,38 @@ function validateAppearance() {
   });
 
   inspection.rejectionData.data[step] = rejectionData;
+}
 
-  console.log(rejectionData);
+function validateRoomTemp() {
+  const roomData = inspection.outgoingData.roomData;
+  const input = roomData.input;
+  const logic = roomData.logic;
+  const standard = roomData.standard;
+
+  roomData.judgement = store.checkLogic(logic, standard, input);
+  roomValid.value = roomData.judgement;
+  const valid = roomData.judgement ? 1 : 0;
+  inspection.judgement = valid ? null : 0;
+  if (!roomData.judgement) {
+    let find = inspection.rejectionData.data[
+      inspection.inspectionStep.step
+    ].find((e) => e.id == "9999");
+
+    if (!find) {
+      inspection.rejectionData.data.outgoing.push({
+        id: "9999",
+        label: "Room Temperature",
+        judgement: roomData.judgement,
+        input: input,
+        standard: standard,
+        logic: { id: logic },
+      });
+    }
+  } else {
+    inspection.rejectionData.data.outgoing =
+      inspection.rejectionData.data.outgoing.filter((e) => e.id != "9999");
+  }
+  populateInput();
 }
 
 function validateInput(index, Yindex) {
@@ -795,7 +854,12 @@ function populateInput() {
 
   stepValid.value = filtered.every((value) => value.judgement);
 
-  inspection.currentData.judgement = stepValid.value;
+  inspection.currentData.judgement =
+    inspection.inspectionStep.step === "outgoing" &&
+    props.roomCheck == 1 &&
+    inspection.inspectionStep.n === 1
+      ? stepValid.value && roomValid.value
+      : stepValid.value;
 
   next.value = filtered.every((item) => item.input !== "");
 }

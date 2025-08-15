@@ -28,7 +28,54 @@
         /> -->
       </div>
     </v-col>
-    <v-col cols="4">
+
+    <v-col cols="3">
+      <v-card class="mt-2">
+        <template #title>Check Room Temperature</template>
+        <template #text>
+          <v-btn-toggle
+            v-model="formData.roomTemp"
+            class="w-100"
+            density="compact"
+            rounded="pill"
+            mandatory
+          >
+            <v-btn
+              prepend-icon="mdi-power"
+              variant="outlined"
+              class="w-50"
+              color="primary"
+              :value="1"
+            >
+              ON
+            </v-btn>
+            <v-btn
+              prepend-icon="mdi-power"
+              variant="outlined"
+              color="error"
+              class="w-50"
+              :value="0"
+            >
+              Off
+            </v-btn>
+          </v-btn-toggle>
+          <v-divider class="my-2"></v-divider>
+          <v-sheet height="150px">
+            <div
+              class="w-100 h-100 d-flex align-center justify-center text-center"
+            >
+              <div class="text-h6" v-if="formData.roomTemp === 1">
+                The room temperature will be checked
+              </div>
+              <div class="text-h6" v-if="formData.roomTemp === 0">
+                The room temperature will not be checked
+              </div>
+            </div>
+          </v-sheet>
+        </template>
+      </v-card>
+    </v-col>
+    <v-col cols="3">
       <v-card class="mt-2">
         <template #title>Header Type</template>
         <template #text>
@@ -57,7 +104,7 @@
         </template>
       </v-card>
     </v-col>
-    <v-col cols="4">
+    <v-col cols="3">
       <v-card class="mt-2">
         <template #title>Kneading Type</template>
         <template #text>
@@ -86,7 +133,7 @@
         </template>
       </v-card>
     </v-col>
-    <v-col cols="4">
+    <v-col cols="3">
       <v-card class="mt-2">
         <template #title>Extruding Type</template>
         <template #text>
@@ -147,6 +194,7 @@ const formData = reactive({
   pressOn: false,
   outGoingOn: false,
   heaterOn: false,
+  roomTemp: 0,
 });
 
 watch(

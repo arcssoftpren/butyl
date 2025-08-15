@@ -33,6 +33,10 @@ app.get("*", (req, res) => {
 
 const server = http.createServer(app);
 
+const updateDB = require("./helpers/addRoomTempColumn");
+
+updateDB();
+
 server.listen(PORT, IP, () => {
   console.log(`Server running at http://${IP}:${PORT}`);
 });

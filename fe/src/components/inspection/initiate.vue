@@ -224,7 +224,7 @@ watch(partId, async (e) => {
   if (e != null) {
     let find = parts.value.find((f) => f.partNumber == e);
     part.value = { ...toRaw(find) };
-    inspection.value.registerPart(part.value);
+    await inspection.value.registerPart(part.value);
 
     store.ajax({ partNumber: e }, "/parts/getdrawing", "post").then((img) => {
       actImage.value = img.act;

@@ -146,6 +146,7 @@
               <inspectionStep
                 :inspection-data="selected"
                 :refresh="refresh"
+                :room-check="selected.partData.roomCheck"
                 v-else
               ></inspectionStep>
             </div>

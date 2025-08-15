@@ -39,5 +39,6 @@ router.post("/parts/addtype", part.addType);
 router.post("/parts/gettypes", part.getTypes);
 router.post("/parts/edittype", part.editType);
 router.post("/parts/deletetype", part.deleteType);
+router.post("/parts/getroomcheck", part.getRoomCheck);
 
 module.exports = router;
