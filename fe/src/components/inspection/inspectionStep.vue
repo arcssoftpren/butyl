@@ -503,7 +503,6 @@
   <div v-else>
     <v-divider class="my-5"></v-divider>
     <div>
-      {{ inspection.rejectionData }}
       <v-table class="mytable">
         <thead>
           <tr>
