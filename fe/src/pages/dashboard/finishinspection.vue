@@ -380,7 +380,7 @@ function printFitToA4() {
 
   const fileName = `PIR Butyl ${selected.value.insData.partData.partNumber} ${selected.value.headerData.poNumber}`;
   const opt = {
-    margin: [5, 5, 5, 5], // margin PDF (dalam inci, bisa array [atas, kiri, bawah, kanan])
+    margin: [2, 2, 2, 2], // margin PDF (dalam inci, bisa array [atas, kiri, bawah, kanan])
     filename: fileName,
     pagebreak: { mode: ["avoid"] },
     image: { type: "jpeg", quality: 0.5 },
