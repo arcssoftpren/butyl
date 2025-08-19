@@ -42,6 +42,18 @@
           <td class="text-end">
             {{ item.prodQty }}
           </td>
+
+          <td class="text-center">
+            <v-btn
+              prepend-icon="mdi-pencil"
+              @click="openDialog('edit', item)"
+              variant="outlined"
+              density="compact"
+              rounded="pill"
+            >
+              edit
+            </v-btn>
+          </td>
           <td class="text-center">
             <v-btn
               density="compact"
@@ -69,6 +81,7 @@
           </th>
           <th>Lot Number</th>
           <th class="text-end">Qty.</th>
+          <th class="text-center">Header</th>
           <th class="text-center">Review</th>
         </tr>
       </template>
