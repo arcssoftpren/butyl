@@ -94,7 +94,7 @@
       fullscreen
       transition="dialog-transition"
     >
-      <v-card>
+      <v-card v-if="dialogData.key == 'open'">
         <template #append>
           <v-btn
             @click="dialog = false"
@@ -271,6 +271,30 @@
           >
         </template>
       </v-card>
+
+      <v-card v-else>
+        <template #append>
+          <v-btn
+            @click="dialog = false"
+            density="compact"
+            icon
+            class="mt-2 ms-2"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+        <template #title>{{ dialogData.title }}</template>
+        <template #subtitle>{{ dialogData.subtitle }}</template>
+        <template #text>
+          <div class="h-100">
+            <editHeader
+              :header-data="selected.headerData"
+              :ins-id="selected.insId"
+              @refresh="refresh"
+            ></editHeader>
+          </div>
+        </template>
+      </v-card>
     </v-dialog>
   </div>
 </template>
@@ -310,6 +334,14 @@ const scaling = () => {
 };
 
 const openDialog = async (key, item) => {
+  dialogData.key = key;
+  if (key == "edit") {
+    dialogData.title = "Edit Inspection Header";
+    dialogData.subtitle = "Please fill all required data.";
+  } else {
+    dialogData.title = "Open Inspection Report";
+    dialogData.subtitle = "Download inpection report here.";
+  }
   store
     .ajax(
       { userId: item.insData.approval.picData.userId },
