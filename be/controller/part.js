@@ -393,7 +393,11 @@ module.exports = {
   },
   addType: async (req, res) => {
     try {
-      const data = req.body;
+      let data = req.body;
+      data.extrudingItems = "[]";
+      data.kneadingItems = "[]";
+      data.outgoingItems = "[]";
+      data.pressItems = "[]";
       const { typeNumber } = data;
       const db = new Crud();
       db.where("typeNumber", "=", typeNumber);
