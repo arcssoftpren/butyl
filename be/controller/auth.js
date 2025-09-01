@@ -378,8 +378,8 @@ module.exports = {
   getautobackupData: async (req, res) => {
     try {
       const backupDir = path.join(__dirname, "../autobackup");
-      const files = await fs.promises.readdir(backupDir);
-      const backups = files
+      let files = await fs.promises.readdir(backupDir);
+      let backups = files
         .filter((file) => file.endsWith(".sql"))
         .map((file) => {
           const filePath = path.join(backupDir, file);
@@ -390,7 +390,26 @@ module.exports = {
             link: `../autobackup/${file}`,
           };
         });
-      return res.status(200).json(backups[0]);
+
+      if (backups.length < 1) {
+        await full();
+        let files = await fs.promises.readdir(backupDir);
+        let backups = files
+          .filter((file) => file.endsWith(".sql"))
+          .map((file) => {
+            const filePath = path.join(backupDir, file);
+            const stats = fs.statSync(filePath);
+            return {
+              fileName: file,
+              backupDate: stats.mtime,
+              link: `../autobackup/${file}`,
+            };
+          });
+
+        return res.status(200).json(backups[0]);
+      } else {
+        return res.status(200).json(backups[0]);
+      }
     } catch (error) {
       console.log(error);
       return res
@@ -459,3 +478,19 @@ module.exports = {
     }
   },
 };
+
+async function full() {
+  try {
+    const db = new Crud();
+
+    await db.fullBackup(
+      path.join(
+        __dirname,
+        "../autobackup",
+        `autobackup_${moment().format("YYYYMMDD_HHmmss")}.sql`
+      )
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
