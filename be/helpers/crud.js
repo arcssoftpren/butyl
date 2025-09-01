@@ -1,4 +1,8 @@
 const database = require("../config/database");
+const moment = require("moment");
+const fs = require("fs");
+const path = require("path");
+const mysql = require("mysql2/promise");
 
 class Crud {
   constructor() {
@@ -210,6 +214,114 @@ class Crud {
 
   viewQuery() {
     return this.query;
+  }
+
+  /**
+   * Melakukan full backup (export) database MySQL ke file .sql tanpa menggunakan cmd.
+   * @param {string} backupFilePath - Path file hasil backup (misal: './backup.sql')
+   * @returns {Promise<string>} - Path file backup jika sukses
+   */
+  async fullBackup(backupFilePath) {
+    const user = process.env.DB_USER || "root";
+    const password = process.env.DB_PASSWORD || "";
+    const host = process.env.DB_HOST || "localhost";
+    const databaseName = "butyl";
+
+    // Pastikan direktori tujuan ada
+    fs.mkdirSync(path.dirname(backupFilePath), { recursive: true });
+
+    const connection = await mysql.createConnection({
+      host,
+      user,
+      password,
+      database: databaseName,
+      multipleStatements: true,
+    });
+
+    try {
+      // Ambil semua tabel
+      const [tables] = await connection.query("SHOW TABLES");
+      const tableKey = `Tables_in_${databaseName}`;
+      let sqlDump = `-- Backup database ${databaseName} ${moment().format(
+        "YYYY-MM-DD HH:mm:ss"
+      )}\n\n`;
+      // Tambahkan statement CREATE DATABASE jika belum ada
+      sqlDump += `--\n-- Create database if not exists\n--\n`;
+      sqlDump += `CREATE DATABASE IF NOT EXISTS \`${databaseName}\`;\nUSE \`${databaseName}\`;\n\n`;
+      for (const row of tables) {
+        const table = row[tableKey];
+
+        // Struktur tabel
+        const [[{ "Create Table": createTableSql }]] = await connection.query(
+          `SHOW CREATE TABLE \`${table}\``
+        );
+        sqlDump += `--\n-- Table structure for table \`${table}\`\n--\n\n`;
+        sqlDump += `DROP TABLE IF EXISTS \`${table}\`;\n${createTableSql};\n\n`;
+
+        // Data tabel
+        const [rows] = await connection.query(`SELECT * FROM \`${table}\``);
+        if (rows.length > 0) {
+          sqlDump += `--\n-- Dumping data for table \`${table}\`\n--\n\n`;
+          const columns = Object.keys(rows[0])
+            .map((col) => `\`${col}\``)
+            .join(", ");
+          for (const rowData of rows) {
+            const values = Object.values(rowData)
+              .map((val) => (val === null ? "NULL" : connection.escape(val)))
+              .join(", ");
+            sqlDump += `INSERT INTO \`${table}\` (${columns}) VALUES (${values});\n`;
+          }
+          sqlDump += "\n";
+        }
+      }
+
+      fs.writeFileSync(backupFilePath, sqlDump, "utf8");
+      await connection.end();
+      return backupFilePath;
+    } catch (err) {
+      await connection.end();
+      throw new Error("Backup gagal: " + err.message);
+    }
+  }
+  /**
+   * Mengimpor file SQL ke database MySQL.
+   * @param {string} sqlFile - Path file SQL yang akan diimpor.
+   * @returns {Promise<void>}
+   */
+  async importDb(sqlFile) {
+    const user = process.env.DB_USER || "root";
+    const password = process.env.DB_PASSWORD || "";
+    const host = process.env.DB_HOST || "localhost";
+    const databaseName = "butyl";
+
+    if (!fs.existsSync(sqlFile)) {
+      throw new Error("File SQL tidak ditemukan: " + sqlFile);
+    }
+
+    const sql = fs.readFileSync(sqlFile, "utf8");
+
+    // Cek apakah file SQL mengandung 'CREATE DATABASE IF EXISTS' dan nama database 'butyl'
+    const pattern = /CREATE\s+DATABASE\s+IF\s+NOT\s+EXISTS\s+`?butyl`?/i;
+    if (!pattern.test(sql)) {
+      throw new Error(
+        "File SQL tidak valid: harus mengandung 'CREATE DATABASE IF EXISTS butyl'"
+      );
+    }
+
+    const connection = await mysql.createConnection({
+      host,
+      user,
+      password,
+      multipleStatements: true,
+    });
+
+    try {
+      await connection.query(sql);
+      await connection.end();
+    } catch (err) {
+      await connection.end();
+      throw new Error("Import gagal: " + err.message);
+    }
   }
 }
 

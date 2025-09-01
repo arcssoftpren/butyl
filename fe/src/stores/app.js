@@ -119,6 +119,12 @@ export const useAppStore = defineStore("app", {
         icon: "mdi-video",
         path: "/setup/tutorial",
       },
+      {
+        title: "Data Management",
+        subtitle: "Make a backup, restore, or reset the database.",
+        icon: "mdi-database",
+        path: "/setup/database",
+      },
     ],
     menus: [
       {

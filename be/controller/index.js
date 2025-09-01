@@ -15,6 +15,12 @@ router.post("/auth/getsignfile", auth.getSignFile);
 router.post("/auth/edituser", auth.editUser);
 router.post("/auth/deleteuser", auth.deleteUser);
 router.post("/auth/getuserdata", auth.getUserData);
+router.post("/auth/newbackup", auth.fullBackup);
+router.post("/auth/getbackups", auth.getBackups);
+router.post("/auth/downloadbackup", auth.downloadBackup);
+router.post("/auth/deletebackup", auth.deleteBackup);
+router.post("/auth/restorebackup", auth.restoreBackup);
+router.post("/auth/getautobackup", auth.getautobackupData);
 
 router.post("/inspection/logics", part.getLogics);
 router.post("/inspection/methods", part.getTools);

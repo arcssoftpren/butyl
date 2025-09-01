@@ -3,6 +3,7 @@ const { crypter } = require("../helpers/crypter");
 const path = require("path"); // Untuk membangun path file secara aman
 const fs = require("fs");
 const mime = require("mime-types");
+const moment = require("moment");
 
 module.exports = {
   login: async (req, res) => {
@@ -293,6 +294,168 @@ module.exports = {
       return res.status(200).json({});
     } catch (error) {
       console.log(error);
+    }
+  },
+  fullBackup: async (req, res) => {
+    try {
+      const db = new Crud();
+      if (res) {
+        const backupFilePath = await db.fullBackup(
+          path.join(
+            __dirname,
+            "../backups",
+            `bu_${moment().format("YYYYMMDD_HHmmss")}.sql`
+          )
+        );
+        return res
+          .status(200)
+          .json({ message: "Backup successful", path: backupFilePath });
+      } else {
+        await db.fullBackup(
+          path.join(
+            __dirname,
+            "../autobackup",
+            `autobackup_${moment().format("YYYYMMDD_HHmmss")}.sql`
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      if (res) {
+        return res.status(500).json({ message: "Backup failed", error });
+      }
+    }
+  },
+
+  getBackups: async (req, res) => {
+    try {
+      let backupDir = path.join(__dirname, "../backups");
+      const files = await fs.promises.readdir(backupDir);
+      const backups = files
+        .filter((file) => file.endsWith(".sql"))
+        .map((file) => {
+          const filePath = path.join(backupDir, file);
+          const stats = fs.statSync(filePath);
+          return {
+            fileName: file,
+            backupDate: stats.mtime,
+            link: `../backups/${file}`,
+          };
+        });
+      return res.status(200).json(backups);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Error retrieving backups" });
+    }
+  },
+  downloadBackup: async (req, res) => {
+    try {
+      const { fileName, autoBackup } = req.body;
+      let fn;
+      let backupDir;
+      if (!autoBackup) {
+        backupDir = path.join(__dirname, "../backups");
+        fn = fileName;
+      } else {
+        backupDir = path.join(__dirname, "../autobackup");
+        fn = "butyl_autoBackup";
+      }
+      const filePath = path.join(backupDir, fileName);
+
+      // Cek file ada
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "File not found" });
+      }
+
+      res.setHeader("Content-Disposition", `attachment; filename=\"${fn}\"`);
+      res.setHeader("Content-Type", "application/sql");
+      return res.sendFile(filePath);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Error downloading backup" });
+    }
+  },
+  getautobackupData: async (req, res) => {
+    try {
+      const backupDir = path.join(__dirname, "../autobackup");
+      const files = await fs.promises.readdir(backupDir);
+      const backups = files
+        .filter((file) => file.endsWith(".sql"))
+        .map((file) => {
+          const filePath = path.join(backupDir, file);
+          const stats = fs.statSync(filePath);
+          return {
+            fileName: file,
+            backupDate: stats.mtime,
+            link: `../autobackup/${file}`,
+          };
+        });
+      return res.status(200).json(backups[0]);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error retrieving autobackup data" });
+    }
+  },
+  deleteBackup: async (req, res) => {
+    const fileName = req.body.fileName;
+    const backupDir = path.join(__dirname, "../backups");
+    const filePath = path.join(backupDir, fileName);
+
+    // Cek file ada
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    fs.unlinkSync(filePath);
+    return res.status(200).json({ message: "Backup deleted successfully" });
+  },
+
+  restoreBackup: async (req, res) => {
+    const tempBackupDir = path.join(__dirname, "../tempBackup");
+    try {
+      if (!req.files || Object.keys(req.files).length === 0) {
+        const fileName = req.body.fileName;
+        const backupDir = path.join(__dirname, "../backups");
+        const filePath = path.join(backupDir, fileName);
+        if (!fs.existsSync(filePath)) {
+          return res.status(404).json({ message: "File not found" });
+        }
+
+        const db = new Crud();
+        await db.importDb(filePath);
+        return res
+          .status(200)
+          .json({ message: "Backup file uploaded", path: filePath });
+      } else {
+        const backupFile = req.files.sqlFile;
+        if (!fs.existsSync(tempBackupDir)) {
+          fs.mkdirSync(tempBackupDir, { recursive: true });
+        }
+        const tempFilePath = path.join(tempBackupDir, backupFile.name);
+        await backupFile.mv(tempFilePath);
+        const db = new Crud();
+        await db.importDb(tempFilePath);
+
+        // Hapus seluruh isi tempBackup setelah selesai
+        fs.readdirSync(tempBackupDir).forEach((file) => {
+          fs.unlinkSync(path.join(tempBackupDir, file));
+        });
+
+        return res
+          .status(200)
+          .json({ message: "Backup file uploaded", path: tempFilePath });
+      }
+    } catch (error) {
+      // Hapus seluruh isi tempBackup juga jika error
+      if (fs.existsSync(tempBackupDir)) {
+        fs.readdirSync(tempBackupDir).forEach((file) => {
+          fs.unlinkSync(path.join(tempBackupDir, file));
+        });
+      }
+      console.log(error);
+      return res.status(500).json({ message: "Error restoring backup" });
     }
   },
 };

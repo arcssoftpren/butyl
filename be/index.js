@@ -9,6 +9,7 @@ const fileUpload = require("express-fileupload");
 const app = express();
 app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
+const fs = require("fs");
 
 const IP = process.env.SERVER_IP || "127.0.0.1";
 const PORT = process.env.SERVER_PORT || 3000;
@@ -21,11 +22,29 @@ app.use(
   })
 );
 
+const cron = require("node-cron");
+
+const auth = require("./controller/auth");
+
+// Menjadwalkan task setiap hari jam 2 pagi
+cron.schedule("32 16 * * *", async () => {
+  const backupDir = path.join(__dirname, "autobackup");
+
+  if (fs.existsSync(backupDir)) {
+    fs.readdirSync(backupDir).forEach((file) => {
+      fs.unlinkSync(path.join(backupDir, file));
+    });
+  }
+  await auth.fullBackup();
+  console.log("Backup selesai");
+});
+
 // app.get("/", (req, res) => res.send("Hello World!"));
 
 const router = require("./controller");
 app.use("/", router);
 
+app.use(express.static(path.join(__dirname, "backups")));
 app.use(express.static(path.join(__dirname, "dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
