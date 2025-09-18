@@ -420,10 +420,17 @@ const refresh = async () => {
   store.preload = false;
 };
 
-function printFitToA4() {
+async function printFitToA4() {
   const el = table.value;
 
-  const fileName = `PIR Butyl ${selected.value.insData.partData.partNumber} ${selected.value.headerData.poNumber}`;
+  const res = await store.ajax({}, "/parts/gettypes", "post");
+  store.preload = false;
+  let partTypes = res.find(
+    (e) => e.id == selected.value.insData.partData.partType
+  );
+
+  const fileName = `${selected.value.insData.partData.partNumber}_${partTypes.typeNumber}_${selected.value.headerData.orderNumber}_${selected.value.headerData.prodQty}.pdf`;
+  console.log(fileName);
   const opt = {
     margin: [2, 2, 2, 2], // margin PDF (dalam inci, bisa array [atas, kiri, bawah, kanan])
     filename: fileName,
