@@ -429,7 +429,13 @@ async function printFitToA4() {
     (e) => e.id == selected.value.insData.partData.partType
   );
 
-  const fileName = `${selected.value.insData.partData.partNumber}_${partTypes.typeNumber}_${selected.value.headerData.orderNumber}_${selected.value.headerData.prodQty}.pdf`;
+  const fileName = `${selected.value.insData.partData.partNumber}_${
+    partTypes.typeNumber
+  }_${
+    selected.value.headerData.deliveryDate == ""
+      ? selected.value.headerData.orderNumber
+      : moment(selected.value.headerData.deliveryDate).format("DDMMYYYY")
+  }_${selected.value.headerData.prodQty}.pdf`;
   console.log(fileName);
   const opt = {
     margin: [2, 2, 2, 2], // margin PDF (dalam inci, bisa array [atas, kiri, bawah, kanan])
