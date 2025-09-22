@@ -622,7 +622,7 @@
           block
         ></v-btn>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="6" v-if="inspection.inspectionStep.step != 'outgoing'">
         <v-btn
           :color="inspection.currentData.judgement ? 'success' : 'error'"
           :disabled="!next"
@@ -632,6 +632,30 @@
           :text="inspection.currentData.judgement ? 'next' : 'Report NG'"
           @click="procceed"
         ></v-btn>
+      </v-col>
+      <v-col cols="6" v-else>
+        <v-row>
+          <v-col cols="6">
+            <v-btn
+              @click="saveCurrentData"
+              variant="outlined"
+              rounded="pill"
+              block
+              >Save</v-btn
+            >
+          </v-col>
+          <v-col cols="6">
+            <v-btn
+              :color="inspection.currentData.judgement ? 'success' : 'error'"
+              :disabled="!next"
+              :variant="inspection.currentData.judgement ? 'outlined' : 'flat'"
+              rounded="pill"
+              block
+              :text="inspection.currentData.judgement ? 'next' : 'Report NG'"
+              @click="procceed"
+            ></v-btn>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </div>
@@ -853,6 +877,23 @@ function populateInput() {
 
   stepValid.value = filtered.every((value) => value.judgement);
 
+  // Update roomValid jika kondisi room check aktif
+  if (
+    inspection.inspectionStep.step === "outgoing" &&
+    props.roomCheck == 1 &&
+    inspection.inspectionStep.n === 1
+  ) {
+    const roomData = inspection.outgoingData.roomData;
+    if (roomData.input) {
+      roomData.judgement = store.checkLogic(
+        roomData.logic,
+        roomData.standard,
+        roomData.input
+      );
+      roomValid.value = roomData.judgement;
+    }
+  }
+
   inspection.currentData.judgement =
     inspection.inspectionStep.step === "outgoing" &&
     props.roomCheck == 1 &&
@@ -861,6 +902,19 @@ function populateInput() {
       : stepValid.value;
 
   next.value = filtered.every((item) => item.input !== "");
+
+  // Debug log
+  console.log("populateInput called");
+  console.log("stepValid:", stepValid.value);
+  console.log("roomValid:", roomValid.value);
+  console.log(
+    "inspection.currentData.judgement:",
+    inspection.currentData.judgement
+  );
+  console.log(
+    "filtered judgements:",
+    filtered.map((f) => f.judgement)
+  );
 }
 
 function appProceed() {
@@ -975,6 +1029,39 @@ function procceed() {
       props.refresh();
     });
   }
+}
+
+function saveCurrentData() {
+  const data = inspection.currentData.data;
+  const index = data.findIndex(
+    (e) => e.key == `N${inspection.inspectionStep.n}`
+  );
+  const items = data[index].items;
+  let filtered = items.filter((e) => e.isCheck);
+
+  const step = inspection.inspectionStep.step;
+  const userData = store.userData;
+  const { userName, userId } = userData;
+
+  inspection.currentData.inspector = {
+    userId,
+    userName,
+  };
+
+  inspection.currentData.inspectionDate = moment().format("YYYY-MM-DD");
+
+  // Simpan data tanpa mengubah judgement atau step
+  let json = inspection.toJSON();
+  nextTick().then(async () => {
+    await store.ajax(json, "/inspection/save", "post");
+    // Update state setelah save
+    populateInput();
+    console.log(
+      "After saveCurrentData, judgement:",
+      inspection.currentData.judgement
+    );
+    store.preload = false;
+  });
 }
 
 function getBg(item) {
