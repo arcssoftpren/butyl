@@ -111,7 +111,7 @@
       scrollable
       persistent
       :overlay="false"
-      fullscreen=""
+      :fullscreen="dialogData.key != 'search' ? true : false"
       transition="dialog-transition"
     >
       <v-card>
@@ -128,7 +128,7 @@
         <template #title>{{ dialogData.title }}</template>
         <template #subtitle>{{ dialogData.subtitle }}</template>
         <template #text>
-          <div class="h-100">
+          <div class="h-100" v-if="dialogData.key != 'search'">
             <initiate
               :close-me="refresh"
               v-if="dialogData.key == 'new'"
@@ -161,6 +161,17 @@
               ></editHeader>
             </div>
           </div>
+          <div v-else class="ma-2">
+            <v-text-field
+              variant="outlined"
+              rounded="pill"
+              density="compact"
+              label="Search Inspection by Part Number"
+              v-model="partNumber"
+              @keyup.enter="refresh()"
+            >
+            </v-text-field>
+          </div>
         </template>
       </v-card>
     </v-dialog>
@@ -174,6 +185,7 @@ const store = useAppStore();
 const search = ref();
 const dialog = ref(false);
 const selected = ref(null);
+const partNumber = ref("");
 const inspections = ref([]);
 const dialogData = reactive({
   key: "",
@@ -184,6 +196,10 @@ const dialogData = reactive({
 const openDialog = (key, item) => {
   dialogData.key = key;
   switch (key) {
+    case "search":
+      dialogData.title = "Search Inspection";
+      dialogData.subtitle = "Please fill all required data.";
+      break;
     case "new":
       dialogData.title = "Initiate new inspection";
       dialogData.subtitle = "Please fill all required data.";
@@ -237,15 +253,19 @@ const openDialog = (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  inspections.value = await store.ajax(
-    { func: "neutral" },
-    "/inspection",
-    "post"
-  );
-  store.preload = false;
+  store
+    .ajax(
+      { func: "neutral", partNumber: partNumber.value },
+      "/inspection",
+      "post"
+    )
+    .then((res) => {
+      inspections.value = res;
+      store.preload = false;
+    });
 };
 
 onBeforeMount(() => {
-  refresh();
+  openDialog("search");
 });
 </script>

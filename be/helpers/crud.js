@@ -28,6 +28,9 @@ class Crud {
   where(key, operator = "=", value) {
     this.whereArr.push({ key, operator, value });
   }
+  whereOr(key, operator = "=", value) {
+    this.whereArr.push({ key, operator, value, type: "OR" });
+  }
 
   join(type, table, a, b) {
     this.joinArr.push({ table: table, type: type, a: a, b: b });
@@ -61,7 +64,9 @@ class Crud {
         wherequery +=
           index === 0
             ? ` WHERE ${element.key} ${element.operator} ?`
-            : ` AND ${element.key} ${element.operator} ?`;
+            : ` ${element.type ? "OR" : "AND"} ${element.key} ${
+                element.operator
+              } ?`;
       });
     }
     this.query += wherequery;
@@ -79,6 +84,8 @@ class Crud {
         this.query,
         this.whereArr.map((w) => w.value)
       );
+
+      console.log("Executed Query:", this.query);
 
       this.selectArr = [];
       this.whereArr = [];
@@ -165,41 +172,41 @@ class Crud {
     }
   }
 
-  async whereOr(table, orConditions) {
-    try {
-      if (this.selectArr.length === 0) {
-        this.selectArr.push("*");
-      }
+  // async whereOr(table, orConditions) {
+  //   try {
+  //     if (this.selectArr.length === 0) {
+  //       this.selectArr.push("*");
+  //     }
 
-      const whereClause = orConditions
-        .map((cond) => {
-          return (
-            "(" +
-            Object.entries(cond)
-              .map(([key, val]) =>
-                val === null ? `${key} IS NULL` : `${key} = ?`
-              )
-              .join(" AND ") +
-            ")"
-          );
-        })
-        .join(" OR ");
+  //     const whereClause = orConditions
+  //       .map((cond) => {
+  //         return (
+  //           "(" +
+  //           Object.entries(cond)
+  //             .map(([key, val]) =>
+  //               val === null ? `${key} IS NULL` : `${key} = ?`
+  //             )
+  //             .join(" AND ") +
+  //           ")"
+  //         );
+  //       })
+  //       .join(" OR ");
 
-      const values = orConditions.flatMap((cond) =>
-        Object.values(cond).filter((v) => v !== null)
-      );
+  //     const values = orConditions.flatMap((cond) =>
+  //       Object.values(cond).filter((v) => v !== null)
+  //     );
 
-      const query = `SELECT ${this.selectArr.join(
-        ", "
-      )} FROM ${table} WHERE ${whereClause}`;
+  //     const query = `SELECT ${this.selectArr.join(
+  //       ", "
+  //     )} FROM ${table} WHERE ${whereClause}`;
 
-      const [rows] = await database.promise().query(query, values);
+  //     const [rows] = await database.promise().query(query, values);
 
-      return rows;
-    } catch (err) {
-      throw err;
-    }
-  }
+  //     return rows;
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
 
   async alter(table) {
     try {

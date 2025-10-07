@@ -322,15 +322,25 @@ module.exports = {
 
   getInspections: async (req, res) => {
     try {
-      const { func } = req.body;
+      const startTime = Date.now(); // Start timing
+      const { func, partNumber } = req.body;
       const db = new Crud();
       let response;
+
+      console.log(
+        "[getInspections] Step: Initialize DB and Parse Request",
+        Date.now() - startTime,
+        "ms"
+      );
+
+      if (partNumber) {
+        db.where("partNumber", "=", partNumber);
+      }
       switch (func) {
         case "neutral":
-          response = await db.whereOr("t_inspection", [
-            { judgement: null },
-            { judgement: 3 },
-          ]);
+          db.where("judgement", "IS", null);
+          db.whereOr("judgement", "=", 3);
+          response = await db.get("t_inspection");
           break;
         case "NG":
           db.where("judgement", "=", 0);
@@ -342,24 +352,31 @@ module.exports = {
           break;
       }
 
-      console.log(response);
-
-      response = await Promise.all(
-        response.map((resp) => {
-          Object.entries(resp).forEach(([key, value]) => {
-            const parsable = isValidJSONObject(value);
-            if (parsable) {
-              resp[key] = JSON.parse(value);
-            }
-          });
-
-          Object.entries(resp.headerData).forEach(([key, value]) => {
-            resp[key] = value;
-          });
-
-          return resp;
-        })
+      console.log(
+        "[getInspections] Step: Database Query",
+        Date.now() - startTime,
+        "ms"
       );
+
+      response = response.map((resp) => {
+        Object.entries(resp).forEach(([key, value]) => {
+          if (key === "headerData" && isValidJSONObject(value)) {
+            const headerData = JSON.parse(value);
+            Object.assign(resp, headerData);
+            delete resp.headerData; // Remove headerData after merging
+          } else if (isValidJSONObject(value)) {
+            resp[key] = JSON.parse(value);
+          }
+        });
+        return resp;
+      });
+
+      console.log(
+        "[getInspections] Step: Data Processing",
+        Date.now() - startTime,
+        "ms"
+      );
+
       return res.status(200).json(response);
     } catch (error) {
       console.log(error);
