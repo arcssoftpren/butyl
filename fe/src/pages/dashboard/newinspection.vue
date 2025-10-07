@@ -253,19 +253,13 @@ const openDialog = (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  store
-    .ajax(
-      { func: "neutral", partNumber: partNumber.value },
-      "/inspection",
-      "post"
-    )
-    .then((res) => {
-      inspections.value = res;
-      store.preload = false;
-    });
+  store.ajax({ func: "neutral" }, "/inspection", "post").then((res) => {
+    inspections.value = res;
+    store.preload = false;
+  });
 };
 
 onBeforeMount(() => {
-  openDialog("search");
+  refresh();
 });
 </script>

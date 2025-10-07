@@ -305,16 +305,6 @@ class Crud {
       throw new Error("File SQL tidak ditemukan: " + sqlFile);
     }
 
-    const sql = fs.readFileSync(sqlFile, "utf8");
-
-    // Cek apakah file SQL mengandung 'CREATE DATABASE IF EXISTS' dan nama database 'butyl'
-    const pattern = /CREATE\s+DATABASE\s+IF\s+NOT\s+EXISTS\s+`?butyl`?/i;
-    if (!pattern.test(sql)) {
-      throw new Error(
-        "File SQL tidak valid: harus mengandung 'CREATE DATABASE IF EXISTS butyl'"
-      );
-    }
-
     const connection = await mysql.createConnection({
       host,
       user,
@@ -323,7 +313,28 @@ class Crud {
     });
 
     try {
-      await connection.query(sql);
+      const stream = fs.createReadStream(sqlFile, { encoding: "utf8" });
+      let buffer = "";
+
+      for await (const chunk of stream) {
+        buffer += chunk;
+
+        // Split the buffer into individual statements
+        const statements = buffer.split(";\n");
+        buffer = statements.pop(); // Keep the last incomplete statement
+
+        for (const statement of statements) {
+          if (statement.trim()) {
+            await connection.query(statement);
+          }
+        }
+      }
+
+      // Execute any remaining statement in the buffer
+      if (buffer.trim()) {
+        await connection.query(buffer);
+      }
+
       await connection.end();
     } catch (err) {
       await connection.end();
