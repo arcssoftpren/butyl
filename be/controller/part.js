@@ -358,18 +358,22 @@ module.exports = {
         "ms"
       );
 
-      response = response.map((resp) => {
-        Object.entries(resp).forEach(([key, value]) => {
-          if (key === "headerData" && isValidJSONObject(value)) {
-            const headerData = JSON.parse(value);
-            Object.assign(resp, headerData);
-            delete resp.headerData; // Remove headerData after merging
-          } else if (isValidJSONObject(value)) {
-            resp[key] = JSON.parse(value);
-          }
-        });
-        return resp;
-      });
+      response = await Promise.all(
+        response.map((resp) => {
+          Object.entries(resp).forEach(([key, value]) => {
+            const parsable = isValidJSONObject(value);
+            if (parsable) {
+              resp[key] = JSON.parse(value);
+            }
+          });
+
+          Object.entries(resp.headerData).forEach(([key, value]) => {
+            resp[key] = value;
+          });
+
+          return resp;
+        })
+      );
 
       console.log(
         "[getInspections] Step: Data Processing",

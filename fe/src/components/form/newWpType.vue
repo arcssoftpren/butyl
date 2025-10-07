@@ -151,9 +151,9 @@
               <v-btn variant="outlined" color="primary" class="w-30" value="b">
                 Type B
               </v-btn>
-              <v-btn variant="outlined" color="primary" class="w-30" value="c">
+              <!-- <v-btn variant="outlined" color="primary" class="w-30" value="c">
                 Type C
-              </v-btn>
+              </v-btn> -->
             </v-btn-toggle>
             <v-divider class="my-2"></v-divider>
             <v-img height="150" :src="extType"> </v-img>
