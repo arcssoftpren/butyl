@@ -25,6 +25,16 @@
               New Inspection
             </v-btn>
           </template>
+          <template #prepend>
+            <v-btn
+              @click="openDialog('search')"
+              class="mt-2 ms-2"
+              variant="outlined"
+              rounded="pill"
+              block
+              >Change Part Number</v-btn
+            >
+          </template>
         </v-toolbar>
       </template>
       <template #item="{ item, index }">
@@ -113,6 +123,7 @@
       :overlay="false"
       :fullscreen="dialogData.key != 'search' ? true : false"
       transition="dialog-transition"
+      :max-width="600"
     >
       <v-card>
         <template #append>
@@ -168,9 +179,12 @@
               density="compact"
               label="Search Inspection by Part Number"
               v-model="partNumber"
-              @keyup.enter="refresh()"
             >
             </v-text-field>
+            <v-divider class="my-2"></v-divider>
+            <v-btn variant="outlined" rounded="pill" block @click="refresh()"
+              >Submit</v-btn
+            >
           </div>
         </template>
       </v-card>
@@ -197,8 +211,9 @@ const openDialog = (key, item) => {
   dialogData.key = key;
   switch (key) {
     case "search":
-      dialogData.title = "Search Inspection";
-      dialogData.subtitle = "Please fill all required data.";
+      dialogData.title = "Insert Part Number";
+      dialogData.subtitle =
+        "Please insert part number to show inspection datas.";
       break;
     case "new":
       dialogData.title = "Initiate new inspection";
@@ -253,13 +268,19 @@ const openDialog = (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  store.ajax({ func: "neutral" }, "/inspection", "post").then((res) => {
-    inspections.value = res;
-    store.preload = false;
-  });
+  store
+    .ajax(
+      { func: "neutral", partNumber: partNumber.value },
+      "/inspection",
+      "post"
+    )
+    .then((res) => {
+      inspections.value = res;
+      store.preload = false;
+    });
 };
 
 onBeforeMount(() => {
-  refresh();
+  openDialog("search");
 });
 </script>

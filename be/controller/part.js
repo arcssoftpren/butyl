@@ -338,8 +338,10 @@ module.exports = {
       }
       switch (func) {
         case "neutral":
-          db.where("judgement", "IS", null);
-          db.whereOr("judgement", "=", 3);
+          db.whereOr(
+            { key: "judgement", operator: "IS", value: null },
+            { key: "judgement", operator: "=", value: 3 }
+          );
           response = await db.get("t_inspection");
           break;
         case "NG":
@@ -360,6 +362,7 @@ module.exports = {
 
       response = await Promise.all(
         response.map((resp) => {
+          console.log("Processing inspection:", resp);
           Object.entries(resp).forEach(([key, value]) => {
             const parsable = isValidJSONObject(value);
             if (parsable) {

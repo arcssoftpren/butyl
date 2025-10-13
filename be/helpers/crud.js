@@ -15,6 +15,7 @@ class Crud {
       field: "",
       order: "ASC",
     };
+    this.whereOrArr = [];
   }
 
   select(str) {
@@ -28,8 +29,11 @@ class Crud {
   where(key, operator = "=", value) {
     this.whereArr.push({ key, operator, value });
   }
-  whereOr(key, operator = "=", value) {
-    this.whereArr.push({ key, operator, value, type: "OR" });
+  whereOr(where1, where2) {
+    this.whereOrArr.push({
+      where1,
+      where2,
+    });
   }
 
   join(type, table, a, b) {
@@ -63,11 +67,18 @@ class Crud {
       this.whereArr.forEach((element, index) => {
         wherequery +=
           index === 0
-            ? ` WHERE ${element.key} ${element.operator} ?`
-            : ` ${element.type ? "OR" : "AND"} ${element.key} ${
-                element.operator
-              } ?`;
+            ? ` WHERE (${element.key} ${element.operator} ?)`
+            : ` AND (${element.key} ${element.operator} ?)`;
       });
+
+      let orquery = "";
+
+      if (this.whereOrArr.length > 0) {
+        this.whereOrArr.forEach((element) => {
+          orquery += ` AND (${element.where1.key} ${element.where1.operator} ${element.where1.value} OR ${element.where2.key} ${element.where2.operator} ${element.where2.value})`;
+        });
+        wherequery = `${wherequery} ${orquery}`;
+      }
     }
     this.query += wherequery;
 
