@@ -123,7 +123,7 @@
       :overlay="false"
       :fullscreen="dialogData.key != 'search' ? true : false"
       transition="dialog-transition"
-      :max-width="600"
+      :max-width="700"
     >
       <v-card>
         <template #append>
@@ -172,20 +172,6 @@
               ></editHeader>
             </div>
           </div>
-          <div v-else class="ma-2">
-            <v-text-field
-              variant="outlined"
-              rounded="pill"
-              density="compact"
-              label="Search Inspection by Part Number"
-              v-model="partNumber"
-            >
-            </v-text-field>
-            <v-divider class="my-2"></v-divider>
-            <v-btn variant="outlined" rounded="pill" block @click="refresh()"
-              >Submit</v-btn
-            >
-          </div>
         </template>
       </v-card>
     </v-dialog>
@@ -206,6 +192,7 @@ const dialogData = reactive({
   title: "",
   subtitle: "",
 });
+const process = ref("");
 
 const openDialog = (key, item) => {
   dialogData.key = key;
@@ -268,19 +255,13 @@ const openDialog = (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  store
-    .ajax(
-      { func: "neutral", partNumber: partNumber.value },
-      "/inspection",
-      "post"
-    )
-    .then((res) => {
-      inspections.value = res;
-      store.preload = false;
-    });
+  store.ajax({ func: "neutral" }, "/inspection", "post").then((res) => {
+    inspections.value = res;
+    store.preload = false;
+  });
 };
 
 onBeforeMount(() => {
-  openDialog("search");
+  refresh();
 });
 </script>

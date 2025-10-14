@@ -327,15 +327,10 @@ module.exports = {
       const db = new Crud();
       let response;
 
-      console.log(
-        "[getInspections] Step: Initialize DB and Parse Request",
-        Date.now() - startTime,
-        "ms"
-      );
-
       if (partNumber) {
         db.where("partNumber", "=", partNumber);
       }
+
       switch (func) {
         case "neutral":
           db.whereOr(
@@ -362,7 +357,6 @@ module.exports = {
 
       response = await Promise.all(
         response.map((resp) => {
-          console.log("Processing inspection:", resp);
           Object.entries(resp).forEach(([key, value]) => {
             const parsable = isValidJSONObject(value);
             if (parsable) {
