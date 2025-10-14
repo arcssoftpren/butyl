@@ -82,7 +82,7 @@
           rounded="pill"
           density="compact"
           hide-details=""
-          v-model="inspection.kneadingData.kneadingQlt.pic"
+          v-model="formData.pic"
         />
       </v-col>
       <v-col cols="6">
@@ -93,16 +93,14 @@
           density="compact"
           hide-details=""
           type="date"
-          v-model="inspection.kneadingData.kneadingQlt.date"
+          v-model="formData.date"
         />
       </v-col>
     </v-row>
     <v-divider class="my-5"></v-divider>
     <v-btn
       :disabled="
-        kneadingAtoggle == null ||
-        inspection.kneadingData.kneadingQlt.date == '' ||
-        inspection.kneadingData.kneadingQlt.pic == ''
+        kneadingAtoggle == null || formData.date == '' || formData.pic == ''
       "
       @click="save"
       variant="outlined"
@@ -125,6 +123,11 @@ let inspection = new Inspection();
 let tableStructure = [];
 let kneadingAtoggle = ref(null);
 
+const formData = ref({
+  date: "",
+  pic: "",
+});
+
 onBeforeMount(() => {
   inspection.registerData(localizedData);
   inspection.initInspection(inspection.inspectionStep.step);
@@ -142,8 +145,11 @@ watch(kneadingAtoggle, (e) => {
 async function save() {
   const { userId, userName } = store.userData;
   store.preload = true;
+  inspection.kneadingData.kneadingQlt.date = formData.value.date;
+  inspection.kneadingData.kneadingQlt.pic = formData.value.pic;
   inspection.inspectionStep.step = "appearance";
   inspection.kneadingData.inspector = { userId, userName };
+  console.log(inspection.kneadingData);
   const data = inspection.toJSON();
   nextTick().then(async () => {
     await store.ajax(data, "/inspection/save", "post");
