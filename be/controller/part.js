@@ -3,9 +3,6 @@ const { crypter } = require("../helpers/crypter");
 const path = require("path"); // Untuk membangun path file secara aman
 const fs = require("fs");
 const mime = require("mime-types");
-const { title } = require("process");
-const moment = require("moment");
-const { kMaxLength } = require("buffer");
 
 module.exports = {
   getRoomCheck: async (req, res) => {
@@ -328,17 +325,12 @@ module.exports = {
       db.select("insId, headerData, partNumber, judgement, inspectionStep");
       let response;
 
-      if (partNumber) {
-        db.where("partNumber", "=", partNumber);
-      }
-
       switch (func) {
         case "neutral":
-          db.whereOr(
-            { key: "judgement", operator: "IS", value: null },
-            { key: "judgement", operator: "=", value: 3 }
-          );
           response = await db.get("t_inspection");
+          response = response.filter(
+            (r) => r.judgement === null || r.judgement === 3
+          );
           break;
         case "NG":
           db.select("insData");
@@ -347,10 +339,12 @@ module.exports = {
           break;
         case "OK":
           db.where("judgement", "=", 1);
+          db.where("done", "=", 0);
           response = await db.get("t_inspection");
           break;
         case "FINISH":
           db.where("judgement", "=", 1);
+          db.where("done", "=", 1);
           response = await db.get("t_inspection");
           break;
       }
@@ -432,6 +426,7 @@ module.exports = {
   saveInspection: async (req, res) => {
     try {
       const data = req.body;
+      console.log(data);
       const { insId } = data;
       const db = new Crud();
       db.where("insId", "=", insId);
@@ -615,6 +610,38 @@ module.exports = {
       return res.status(400).json(error);
     }
   },
+  checkApproval: async (req, res) => {
+    try {
+      const test = await testf();
+      if (test) {
+        const database = require("../config/database");
+        await database
+          .promise()
+          .query(
+            `ALTER TABLE t_inspection ADD COLUMN done TINYINT(1) DEFAULT 0;`
+          );
+
+        const dbi = new Crud();
+        const items = await dbi.get("t_inspection");
+        await Promise.all(
+          items.map(async (item) => {
+            const insData = JSON.parse(item.insData);
+            if (insData.approval.date != "") {
+              const dbu = new Crud();
+              dbu.where("insId", "=", item.insId);
+              await dbu.update("t_inspection", { done: 1 });
+            }
+          })
+        );
+        return res.status(200).json({ updated: true });
+      } else {
+        return res.status(200).json({ updated: true });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
 };
 
 function isValidJSONObject(str) {
@@ -624,4 +651,14 @@ function isValidJSONObject(str) {
   } catch {
     return false;
   }
+}
+
+async function testf() {
+  const database = require("../config/database");
+  const test = await database.promise().query(`SELECT COUNT(*) AS ada
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'butyl'
+  AND TABLE_NAME = 't_inspection'
+  AND COLUMN_NAME = 'done';`);
+  return test[0][0].ada == 0;
 }

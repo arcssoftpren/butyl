@@ -904,17 +904,6 @@ function populateInput() {
   next.value = filtered.every((item) => item.input !== "");
 
   // Debug log
-  console.log("populateInput called");
-  console.log("stepValid:", stepValid.value);
-  console.log("roomValid:", roomValid.value);
-  console.log(
-    "inspection.currentData.judgement:",
-    inspection.currentData.judgement
-  );
-  console.log(
-    "filtered judgements:",
-    filtered.map((f) => f.judgement)
-  );
 }
 
 function appProceed() {
@@ -1056,10 +1045,6 @@ function saveCurrentData() {
     await store.ajax(json, "/inspection/save", "post");
     // Update state setelah save
     populateInput();
-    console.log(
-      "After saveCurrentData, judgement:",
-      inspection.currentData.judgement
-    );
     store.preload = false;
   });
 }

@@ -425,13 +425,16 @@ const openDialog = async (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  inspections.value = await store.ajax(
-    { func: "FINISH" },
-    "/inspection",
-    "post"
-  );
 
-  store.preload = false;
+  let updated = await store.ajax({}, "/update/approval", "get");
+  if (updated.updated) {
+    inspections.value = await store.ajax(
+      { func: "FINISH" },
+      "/inspection",
+      "post"
+    );
+    store.preload = false;
+  }
 };
 
 async function printFitToA4() {
