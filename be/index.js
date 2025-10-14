@@ -27,7 +27,7 @@ const cron = require("node-cron");
 const auth = require("./controller/auth");
 
 // Menjadwalkan task setiap hari jam 2 pagi
-cron.schedule("32 16 * * *", async () => {
+cron.schedule("00 01 * * *", async () => {
   const backupDir = path.join(__dirname, "autobackup");
 
   if (fs.existsSync(backupDir)) {
@@ -36,7 +36,6 @@ cron.schedule("32 16 * * *", async () => {
     });
   }
   await auth.fullBackup();
-  console.log("Backup selesai");
 });
 
 // app.get("/", (req, res) => res.send("Hello World!"));

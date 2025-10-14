@@ -46,6 +46,7 @@ updater_helper/
 be/autobackup/*
 be/backups/*
 be/tempbackup/*
+be/uploads/*
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
