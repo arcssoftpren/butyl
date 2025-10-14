@@ -35,6 +35,7 @@ router.post("/inspection/deleteitem", part.deleteInsItem);
 router.post("/inspection/", part.getInspections);
 router.post("/inspection/save", part.saveInspection);
 router.post("/inspection/editinstheader", part.editInstHeader);
+router.post("/inspection/getinspectiondata", part.getInspectionData);
 
 router.post("/parts/add", part.addPart);
 router.post("/parts/", part.getParts);

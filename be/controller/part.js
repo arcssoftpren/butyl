@@ -325,6 +325,7 @@ module.exports = {
       const startTime = Date.now(); // Start timing
       const { func, partNumber } = req.body;
       const db = new Crud();
+      db.select("insId, headerData, partNumber, judgement, inspectionStep");
       let response;
 
       if (partNumber) {
@@ -340,10 +341,15 @@ module.exports = {
           response = await db.get("t_inspection");
           break;
         case "NG":
+          db.select("insData");
           db.where("judgement", "=", 0);
           response = await db.get("t_inspection");
           break;
         case "OK":
+          db.where("judgement", "=", 1);
+          response = await db.get("t_inspection");
+          break;
+        case "FINISH":
           db.where("judgement", "=", 1);
           response = await db.get("t_inspection");
           break;
@@ -378,6 +384,44 @@ module.exports = {
         "ms"
       );
 
+      // const db2 = new Crud();
+      // const rr = await db2.get("t_inspection");
+
+      // console.log(
+      //   "[getInspections] Step: test Data",
+      //   Date.now() - startTime,
+      //   "ms"
+      // );
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+
+  getInspectionData: async (req, res) => {
+    try {
+      const { insId } = req.body;
+      const db = new Crud();
+      db.where("insId", "=", insId);
+      let response = await db.get("t_inspection");
+      response = await Promise.all(
+        response.map((resp) => {
+          Object.entries(resp).forEach(([key, value]) => {
+            const parsable = isValidJSONObject(value);
+            if (parsable) {
+              resp[key] = JSON.parse(value);
+            }
+          });
+
+          Object.entries(resp.headerData).forEach(([key, value]) => {
+            resp[key] = value;
+          });
+
+          return resp;
+        })
+      );
       return res.status(200).json(response);
     } catch (error) {
       console.log(error);

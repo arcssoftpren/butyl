@@ -935,37 +935,46 @@ const openDialog = async (key, item) => {
       dialogData.title = "Edit Inspection Header";
       dialogData.subtitle = "Please fill all required data.";
       selected.value = item;
+      dialog.value = true;
       break;
     case "open":
       dialogData.title = "INSPECTION REVIEW";
       dialogData.subtitle =
         "Please review the inspection data before approval.";
-      let data = {
-        ...item.insData,
-        headerData: item.headerData,
-        insId: item.insId,
-        judgement: item.judgement,
-        partNumber: item.partNumber,
-        inspectionStep: item.inspectionStep,
-      };
-
       store
-        .ajax({ partNumber: item.partNumber }, "/parts/getdrawing", "post")
-        .then((e) => {
-          selectedPics.act = e.act;
-          selectedPics.drw = e.drw;
-          store.preload = false;
-        });
+        .ajax({ insId: item.insId }, "/inspection/getinspectiondata", "post")
+        .then((res) => {
+          item = res[0];
 
-      let ins = new Inspection();
-      ins.registerData(data);
-      selected.value = ins;
+          let data = {
+            ...item.insData,
+            headerData: item.headerData,
+            insId: item.insId,
+            judgement: item.judgement,
+            partNumber: item.partNumber,
+            inspectionStep: item.inspectionStep,
+          };
+
+          store
+            .ajax({ partNumber: item.partNumber }, "/parts/getdrawing", "post")
+            .then((e) => {
+              selectedPics.act = e.act;
+              selectedPics.drw = e.drw;
+              store.preload = false;
+            });
+
+          let ins = new Inspection();
+          ins.registerData(data);
+          selected.value = ins;
+
+          dialog.value = true;
+        });
       break;
     case "delete":
       selected.value = item;
+      dialog.value = true;
       return;
   }
-  dialog.value = true;
 };
 
 watch(dialog, (e) => {
@@ -976,9 +985,6 @@ const refresh = async () => {
   dialog.value = false;
   inspections.value = await store.ajax({ func: "OK" }, "/inspection", "post");
 
-  inspections.value = inspections.value.filter(
-    (e) => e.insData.approval.date == ""
-  );
   store.preload = false;
 };
 

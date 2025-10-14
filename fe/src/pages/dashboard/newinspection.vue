@@ -192,77 +192,82 @@ const dialogData = reactive({
   title: "",
   subtitle: "",
 });
-const process = ref("");
 
 const openDialog = (key, item) => {
   dialogData.key = key;
   switch (key) {
-    case "search":
-      dialogData.title = "Insert Part Number";
-      dialogData.subtitle =
-        "Please insert part number to show inspection datas.";
-      break;
     case "new":
       dialogData.title = "Initiate new inspection";
       dialogData.subtitle = "Please fill all required data.";
       break;
     case "open":
-      let data = {
-        ...item.insData,
-        headerData: item.headerData,
-        insId: item.insId,
-        judgement: item.judgement,
-        partNumber: item.partNumber,
-        inspectionStep: item.inspectionStep,
-      };
-      selected.value = data;
+      store
+        .ajax({ insId: item.insId }, "/inspection/getinspectiondata", "post")
+        .then((res) => {
+          let data = {
+            ...res[0].insData,
+            headerData: item.headerData,
+            insId: item.insId,
+            judgement: item.judgement,
+            partNumber: item.partNumber,
+            inspectionStep: item.inspectionStep,
+          };
+          selected.value = data;
 
-      const step = item.inspectionStep.step;
+          const step = item.inspectionStep.step;
 
-      switch (step) {
-        case "kneading":
-          dialogData.title = "Kneading Inspection";
-          dialogData.subtitle = "Please fill all required data.";
+          switch (step) {
+            case "kneading":
+              dialogData.title = "Kneading Inspection";
+              dialogData.subtitle = "Please fill all required data.";
 
-          break;
-        case "appearance":
-          dialogData.title = "Appearance Inspection";
-          dialogData.subtitle = "Please fill all required data.";
-          break;
-        case "extruding":
-          dialogData.title = "Extruding Inspection";
-          dialogData.subtitle = "Please fill all required data.";
-          break;
-        case "press":
-          dialogData.title = "Press Inspection";
-          dialogData.subtitle = "Please fill all required data.";
-          break;
-        case "outgoing":
-          dialogData.title = "Outgoing inspection";
-          dialogData.subtitle = "Please fill all required data.";
-          break;
-      }
+              break;
+            case "appearance":
+              dialogData.title = "Appearance Inspection";
+              dialogData.subtitle = "Please fill all required data.";
+              break;
+            case "extruding":
+              dialogData.title = "Extruding Inspection";
+              dialogData.subtitle = "Please fill all required data.";
+              break;
+            case "press":
+              dialogData.title = "Press Inspection";
+              dialogData.subtitle = "Please fill all required data.";
+              break;
+            case "outgoing":
+              dialogData.title = "Outgoing inspection";
+              dialogData.subtitle = "Please fill all required data.";
+              break;
+          }
+        })
+        .finally(() => {
+          setTimeout(() => {
+            store.preload = false;
+            dialog.value = true;
+          }, 500);
+        });
 
       break;
     case "edit":
       dialogData.title = "Edit Inspection Header";
       dialogData.subtitle = "Please fill all required data.";
       selected.value = item;
+      dialog.value = true;
       break;
   }
-  dialog.value = true;
 };
 
 const refresh = async () => {
   dialog.value = false;
-  store
-    .ajax({ func: "neutral" }, "/inspection", "post")
-    .then(async (response) => {
-      inspections.value = response;
-    })
-    .finally(() => {
-      store.preload = false;
-    });
+  inspections.value = await store.ajax(
+    { func: "neutral" },
+    "/inspection",
+    "post"
+  );
+
+  console.log(inspections.value[0]);
+
+  store.preload = false;
 };
 
 onBeforeMount(() => {

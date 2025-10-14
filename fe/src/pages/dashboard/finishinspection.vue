@@ -302,6 +302,7 @@
 import { useAppStore } from "@/stores/app";
 import html2pdf from "html2pdf.js";
 import moment from "moment";
+import nosign from "@/assets/noImage.webp";
 
 const store = useAppStore();
 const dialog = ref(false);
@@ -336,85 +337,98 @@ const scaling = () => {
 const openDialog = async (key, item) => {
   dialogData.key = key;
   if (key == "edit") {
+    selected.value = item;
     dialogData.title = "Edit Inspection Header";
     dialogData.subtitle = "Please fill all required data.";
+
+    dialog.value = true;
   } else {
     dialogData.title = "Open Inspection Report";
     dialogData.subtitle = "Download inpection report here.";
-  }
-  store
-    .ajax(
-      { userId: item.insData.approval.picData.userId },
-      "/auth/getsignfile",
-      "post"
-    )
-    .then((e) => {
-      approval.value.picData.sign = e;
-    });
-  approval.value = item.insData.approval;
-  const arr = ["kneadingData", "extrudingData", "pressData", "outgoingData"];
-  arr.forEach((a, index) => {
-    const target = item.insData[a].data;
+    store
+      .ajax({ insId: item.insId }, "/inspection/getinspectiondata", "post")
+      .then(async (res) => {
+        item = res[0];
+        store
+          .ajax(
+            { userId: res[0].insData.approval.picData.userId },
+            "/auth/getsignfile",
+            "post"
+          )
+          .then((e) => {
+            approval.value.picData.sign = e;
+          });
 
-    if (target.length > 0 && target.length < 5) {
-      let clone = JSON.parse(JSON.stringify(target[0]));
-      clone.items = clone.items.map((item) => {
-        item.input = "";
-        item.isCheck = false;
-        return toRaw(item);
+        approval.value = item.insData.approval;
+
+        const arr = [
+          "kneadingData",
+          "extrudingData",
+          "pressData",
+          "outgoingData",
+        ];
+        arr.forEach((a, index) => {
+          const target = item.insData[a].data;
+
+          if (target.length > 0 && target.length < 5) {
+            let clone = JSON.parse(JSON.stringify(target[0]));
+            clone.items = clone.items.map((item) => {
+              item.input = "";
+              item.isCheck = false;
+              return toRaw(item);
+            });
+            while (target.length < 5) {
+              target.push(JSON.parse(JSON.stringify(clone)));
+            }
+          }
+
+          let le = 0;
+          switch (processes[index]) {
+            case "kneading":
+              le = 0;
+              break;
+            case "extruding":
+              le =
+                item.insData.kneadingData.insItem.length +
+                parseInt(item.insData.partData.heaterCheck) +
+                1;
+              break;
+            case "press":
+              le =
+                item.insData.kneadingData.insItem.length +
+                item.insData.extrudingData.insItem.length +
+                parseInt(item.insData.partData.heaterCheck) +
+                1;
+              break;
+            case "outgoing":
+              le =
+                item.insData.pressData.insItem.length +
+                item.insData.kneadingData.insItem.length +
+                item.insData.extrudingData.insItem.length +
+                parseInt(item.insData.partData.heaterCheck) +
+                1;
+              break;
+          }
+
+          lengthArr.value[processes[index]] = le;
+        });
+
+        selected.value = item;
+        store.preload = false;
+        dialog.value = true;
+        setTimeout(() => {
+          scaling();
+        }, 100);
       });
-      while (target.length < 5) {
-        target.push(JSON.parse(JSON.stringify(clone)));
-      }
-    }
-
-    let le = 0;
-    switch (processes[index]) {
-      case "kneading":
-        le = 0;
-        break;
-      case "extruding":
-        le =
-          item.insData.kneadingData.insItem.length +
-          parseInt(item.insData.partData.heaterCheck) +
-          1;
-        break;
-      case "press":
-        le =
-          item.insData.kneadingData.insItem.length +
-          item.insData.extrudingData.insItem.length +
-          parseInt(item.insData.partData.heaterCheck) +
-          1;
-        break;
-      case "outgoing":
-        le =
-          item.insData.pressData.insItem.length +
-          item.insData.kneadingData.insItem.length +
-          item.insData.extrudingData.insItem.length +
-          parseInt(item.insData.partData.heaterCheck) +
-          1;
-        break;
-    }
-
-    lengthArr.value[processes[index]] = le;
-  });
-
-  selected.value = item;
-  store.preload = false;
-  dialog.value = true;
-  setTimeout(() => {
-    scaling();
-  }, 100);
-
-  console.log(item);
+  }
 };
 
 const refresh = async () => {
   dialog.value = false;
-  inspections.value = await store.ajax({ func: "OK" }, "/inspection", "post");
-
-  inspections.value = inspections.value.filter(
-    (e) => e.insData.approval.date != ""
+  inspections.value = await store.ajax(
+    { func: "FINISH" },
+    "/inspection",
+    "post"
   );
 
   store.preload = false;
