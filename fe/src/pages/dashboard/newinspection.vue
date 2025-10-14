@@ -25,7 +25,7 @@
               New Inspection
             </v-btn>
           </template>
-          <template #prepend>
+          <!-- <template #prepend>
             <v-btn
               @click="openDialog('search')"
               class="mt-2 ms-2"
@@ -34,7 +34,7 @@
               block
               >Change Part Number</v-btn
             >
-          </template>
+          </template> -->
         </v-toolbar>
       </template>
       <template #item="{ item, index }">
@@ -255,13 +255,26 @@ const openDialog = (key, item) => {
 
 const refresh = async () => {
   dialog.value = false;
-  store.ajax({ func: "neutral" }, "/inspection", "post").then((res) => {
-    inspections.value = res;
-    store.preload = false;
-  });
+  store
+    .ajax({ func: "neutral" }, "/inspection", "post")
+    .then(async (response) => {
+      inspections.value = response;
+    })
+    .finally(() => {
+      store.preload = false;
+    });
 };
 
 onBeforeMount(() => {
   refresh();
 });
+
+function isValidJSONObject(str) {
+  try {
+    const parsed = JSON.parse(str);
+    return typeof parsed === "object" && parsed !== null;
+  } catch {
+    return false;
+  }
+}
 </script>

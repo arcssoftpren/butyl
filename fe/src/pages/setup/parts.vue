@@ -186,6 +186,7 @@ const refresh = async () => {
   try {
     parts.value = await store.ajax({}, "/parts", "post");
     dialog.value = false;
+    console.log(parts.value);
     store.preload = false;
   } catch (error) {}
 };
