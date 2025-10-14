@@ -199,6 +199,7 @@ const openDialog = (key, item) => {
     case "new":
       dialogData.title = "Initiate new inspection";
       dialogData.subtitle = "Please fill all required data.";
+      dialog.value = true;
       break;
     case "open":
       store
