@@ -984,7 +984,6 @@ watch(dialog, (e) => {
 const refresh = async () => {
   dialog.value = false;
   let updated = await store.ajax({}, "/update/approval", "get");
-  console.log(updated);
   if (updated.updated) {
     inspections.value = await store.ajax({ func: "OK" }, "/inspection", "post");
     store.preload = false;
