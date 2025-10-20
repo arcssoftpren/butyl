@@ -96,8 +96,6 @@ class Crud {
         this.whereArr.map((w) => w.value)
       );
 
-      console.log("Executed Query:", this.query);
-
       this.selectArr = [];
       this.whereArr = [];
       this.joinArr = [];

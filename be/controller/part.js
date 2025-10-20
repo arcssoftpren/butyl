@@ -349,12 +349,6 @@ module.exports = {
           break;
       }
 
-      console.log(
-        "[getInspections] Step: Database Query",
-        Date.now() - startTime,
-        "ms"
-      );
-
       response = await Promise.all(
         response.map((resp) => {
           Object.entries(resp).forEach(([key, value]) => {
@@ -370,12 +364,6 @@ module.exports = {
 
           return resp;
         })
-      );
-
-      console.log(
-        "[getInspections] Step: Data Processing",
-        Date.now() - startTime,
-        "ms"
       );
 
       // const db2 = new Crud();
@@ -426,7 +414,6 @@ module.exports = {
   saveInspection: async (req, res) => {
     try {
       const data = req.body;
-      console.log(data);
       const { insId } = data;
       const db = new Crud();
       db.where("insId", "=", insId);
