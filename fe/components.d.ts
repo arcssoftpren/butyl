@@ -39,6 +39,7 @@ declare module 'vue' {
     NewUser: typeof import('./src/components/form/newUser.vue')['default']
     NewWpType: typeof import('./src/components/form/newWpType.vue')['default']
     NgPreview: typeof import('./src/components/inspection/ngPreview.vue')['default']
+    OutgoingInspection: typeof import('./src/components/inspection/outgoingInspection.vue')['default']
     ReportTable: typeof import('./src/components/misc/reportTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

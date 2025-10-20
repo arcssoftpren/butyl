@@ -8,13 +8,18 @@
         <th>Judgement</th>
       </tr>
       <tr>
-        <th rowspan="2" class="text-center">
+        <th
+          rowspan="2"
+          class="text-center"
+          v-if="inspection.inspectionStep.step != 'outgoing'"
+        >
           <h1 class="text-h6 text-uppercase">
             {{ inspection.inspectionStep.step }}
             <br />
             N{{ inspection.inspectionStep.n }}
           </h1>
         </th>
+        <th v-else rowspan="2" class="text-center">OUTGOING</th>
         <th>Customer</th>
         <th>{{ inspection.partData.customer }}</th>
         <th>Production Qty.</th>
@@ -30,10 +35,22 @@
         <th
           :class="inspection.currentData.judgement ? 'bg-success' : 'bg-error'"
           rowspan="2"
-          v-else
+          v-if="
+            inspection.inspectionStep.step != 'appearance' &&
+            inspection.inspectionStep.step != 'outgoing'
+          "
         >
           <div v-if="!inspection.currentData.judgement" class="text-h5">NG</div>
           <div v-if="inspection.currentData.judgement" class="text-h5">OK</div>
+        </th>
+
+        <th
+          :class="outgoingJudgement ? 'bg-success' : 'bg-error'"
+          rowspan="2"
+          v-if="inspection.inspectionStep.step == 'outgoing'"
+        >
+          <div v-if="!outgoingJudgement" class="text-h5">NG</div>
+          <div v-if="outgoingJudgement" class="text-h5">OK</div>
         </th>
       </tr>
       <tr>
@@ -500,7 +517,12 @@
       :text="appearanceValid ? 'SAVE' : 'REPORT NG'"
     ></v-btn>
   </div>
-  <div v-else>
+  <div
+    v-if="
+      inspection.inspectionStep.step != 'outgoing' &&
+      inspection.inspectionStep.step != 'appearance'
+    "
+  >
     <v-divider class="my-5"></v-divider>
     <div>
       <v-table class="mytable">
@@ -659,6 +681,13 @@
       </v-col>
     </v-row>
   </div>
+  <div v-if="inspection.inspectionStep.step == 'outgoing'">
+    <outgoing-inspection
+      @refresh="refresh"
+      @update-outgoing-judgement="setOutgoingJudgement"
+      :inspectionData="inspectionData"
+    ></outgoing-inspection>
+  </div>
 </template>
 
 <script setup>
@@ -667,6 +696,7 @@ import { useAppStore } from "@/stores/app";
 import defDrawing from "@/assets/defaultDesign.png";
 import moment from "moment";
 
+const outgoingJudgement = ref(false);
 const store = useAppStore();
 const props = defineProps(["inspectionData", "refresh", "roomCheck"]);
 let localizedData = { ...toRaw(props.inspectionData) };
@@ -680,6 +710,10 @@ let appearanceValid = ref(false);
 let appEntries = ref([]);
 let stepValid = ref(false);
 let roomValid = ref(false);
+
+const setOutgoingJudgement = (value) => {
+  outgoingJudgement.value = value;
+};
 
 onBeforeMount(async () => {
   inspection.registerData(localizedData);
