@@ -143,7 +143,7 @@
       <v-btn
         color="error"
         :disabled="incomplete"
-        v-if="!ff"
+        v-if="!ff && complete"
         variant="outlined"
         rounded="pill"
         block
