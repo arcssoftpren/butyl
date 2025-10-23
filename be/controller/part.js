@@ -632,13 +632,24 @@ module.exports = {
   },
   repairInsData: async (req, res) => {
     try {
-      const orderNumber = ["spi-336", "spi-337", "spi-338", "by air"];
+      const orderNumber = [
+        "spi-336",
+        "spi-337",
+        "spi-338",
+        "by air",
+        "spi-3377",
+      ];
       const repairDb = new Crud();
       const repairDb2 = new Crud();
       repairDb.select(
-        "insId, partNumber, headerData, judgement, inspectionStep"
+        "insId, t_inspection.partNumber, headerData, judgement, inspectionStep, partType"
       );
-
+      repairDb.join(
+        "left",
+        "t_part",
+        "t_part.partNumber",
+        "t_inspection.partNumber"
+      );
       let response = await repairDb.get("t_inspection");
       response = response.filter((r) => r.judgement != null);
       response = await Promise.all(
@@ -651,12 +662,7 @@ module.exports = {
       response = response.filter((r) =>
         orderNumber.includes(r.poNumber.toLowerCase())
       );
-      response = response.filter(
-        (r) =>
-          r.partNumber.startsWith("DU33") ||
-          r.partNumber.startsWith("TF-26F4") ||
-          r.partNumber.startsWith("17H37284D")
-      );
+      response = response.filter((r) => r.partType === 9 || r.partType === 8);
 
       const ids = response.map((r) => r.insId);
 

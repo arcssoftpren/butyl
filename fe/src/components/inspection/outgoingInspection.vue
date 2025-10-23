@@ -143,7 +143,7 @@
       <v-btn
         color="error"
         :disabled="incomplete"
-        v-if="!ff && complete"
+        v-if="!ff && inspection.outgoingData.roomData.input != ''"
         variant="outlined"
         rounded="pill"
         block
