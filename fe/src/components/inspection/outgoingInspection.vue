@@ -2,6 +2,31 @@
   <v-table class="mytable mt-5">
     <thead>
       <tr>
+        <td colspan="2" class="text-center">Room Temperature</td>
+        <td class="text-center">23 &plusmn; 2 &deg;C</td>
+        <td class="text-center">Thermometer</td>
+        <td
+          :class="
+            inspection.outgoingData.roomData.judgement
+              ? 'bg-success'
+              : 'bg-error'
+          "
+        >
+          <v-text-field
+            @keyup="validateRoomTemp"
+            variant="outlined"
+            rounded="pill"
+            density="compact"
+            hide-details
+            v-model="inspection.outgoingData.roomData.input"
+          />
+        </td>
+      </tr>
+    </thead>
+  </v-table>
+  <v-table class="mytable mt-5">
+    <thead>
+      <tr>
         <td rowspan="2" class="text-center">No.</td>
         <td rowspan="2" class="text-center">Inspection Items</td>
         <td rowspan="2" class="text-center">Standard</td>
@@ -383,13 +408,18 @@ function populateInput() {
 
   next.value = filtered.every((item) => item.input !== "");
 
-  const outgoingJudgement = inspection.currentData.data.every((dataItem) =>
-    dataItem.items.every((it) => it.judgement === 1)
-  );
+  const outgoingJudgement =
+    inspection.currentData.data.every((dataItem) => {
+      const filteredItems = dataItem.items.filter((it) => it.isCheck);
+      return filteredItems.every((it) => it.judgement === 1);
+    }) && inspection.outgoingData.roomData.judgement;
 
-  complete.value = inspection.currentData.data.every((dataItem) =>
-    dataItem.items.every((it) => it.input != "")
-  );
+  console.log("Outgoing Judgement:", outgoingJudgement);
+
+  complete.value =
+    inspection.currentData.data.every((dataItem) =>
+      dataItem.items.every((it) => it.input != "")
+    ) && inspection.outgoingData.roomData.input != "";
 
   incomplete.value = inspection.currentData.data.every((dataItem) =>
     dataItem.items.every((it) => it.input == "")
