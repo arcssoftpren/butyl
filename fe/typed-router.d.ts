@@ -25,6 +25,7 @@ declare module 'vue-router/auto-routes' {
     '/dashboard/nginspection': RouteRecordInfo<'/dashboard/nginspection', '/dashboard/nginspection', Record<never, never>, Record<never, never>>,
     '/setup/accounts': RouteRecordInfo<'/setup/accounts', '/setup/accounts', Record<never, never>, Record<never, never>>,
     '/setup/database': RouteRecordInfo<'/setup/database', '/setup/database', Record<never, never>, Record<never, never>>,
+    '/setup/emergency': RouteRecordInfo<'/setup/emergency', '/setup/emergency', Record<never, never>, Record<never, never>>,
     '/setup/inspectionItem': RouteRecordInfo<'/setup/inspectionItem', '/setup/inspectionItem', Record<never, never>, Record<never, never>>,
     '/setup/inspectionLogic': RouteRecordInfo<'/setup/inspectionLogic', '/setup/inspectionLogic', Record<never, never>, Record<never, never>>,
     '/setup/methods': RouteRecordInfo<'/setup/methods', '/setup/methods', Record<never, never>, Record<never, never>>,

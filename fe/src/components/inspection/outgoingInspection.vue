@@ -131,7 +131,7 @@
     </v-col>
     <v-col cols="6">
       <v-btn
-        v-if="state == 1"
+        v-if="state == 1 && ff"
         variant="outlined"
         rounded="pill"
         block
@@ -141,8 +141,9 @@
         Submit Report
       </v-btn>
       <v-btn
+        color="error"
         :disabled="incomplete"
-        v-if="state == 0"
+        v-if="!ff"
         variant="outlined"
         rounded="pill"
         block
@@ -183,6 +184,13 @@ let stepValid = ref(false);
 let roomValid = ref(false);
 
 let complete = ref(false);
+let ff = computed(() =>
+  inspection.currentData.data.every(
+    (dataItem) =>
+      dataItem.items.every((it) => it.judgement === 1) &&
+      inspection.outgoingData.roomData.judgement
+  )
+);
 let incomplete = ref(false);
 
 onBeforeMount(async () => {
@@ -444,20 +452,24 @@ function procceed() {
   inspection.currentData.inspectionDate = moment().format("YYYY-MM-DD");
   inspection.outgoingData = inspection.currentData;
 
-  const outgoingJudgement = inspection.currentData.data.every((dataItem) =>
-    dataItem.items.every((it) => it.judgement === 1)
+  const outgoingJudgement = inspection.currentData.data.every(
+    (dataItem) =>
+      dataItem.items.every((it) => it.judgement === 1) &&
+      inspection.outgoingData.roomData.judgement
   );
 
   inspection.judgement = outgoingJudgement ? 1 : 0;
 
+  console.log(outgoingJudgement);
+
   // Simpan data dan lanjut ke step berikutnya
   let json = inspection.toJSON();
-  nextTick().then(async () => {
-    await store.ajax(json, "/inspection/save", "post");
-    // Update state setelah save
-    store.preload = false;
-    emits("refresh");
-  });
+  // nextTick().then(async () => {
+  //   await store.ajax(json, "/inspection/save", "post");
+  //   // Update state setelah save
+  //   store.preload = false;
+  //   emits("refresh");
+  // });
 }
 
 function saveCurrentData() {

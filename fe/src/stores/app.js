@@ -125,6 +125,13 @@ export const useAppStore = defineStore("app", {
         icon: "mdi-database",
         path: "/setup/database",
       },
+      {
+        title: "Emergency Reset",
+        subtitle: "Emergency Reset for room tempt error.",
+        icon: "mdi-exclamation",
+        path: "/setup/emergency",
+        video: null,
+      },
     ],
     menus: [
       {

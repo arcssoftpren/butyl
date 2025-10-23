@@ -49,5 +49,7 @@ router.post("/parts/deletetype", part.deleteType);
 router.post("/parts/getroomcheck", part.getRoomCheck);
 
 router.get("/update/approval", part.checkApproval);
+router.post("/repair", part.repairInsData);
+router.post("/reset", part.resetInspections);
 
 module.exports = router;

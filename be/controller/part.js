@@ -3,6 +3,7 @@ const { crypter } = require("../helpers/crypter");
 const path = require("path"); // Untuk membangun path file secara aman
 const fs = require("fs");
 const mime = require("mime-types");
+const database = require("../config/database");
 
 module.exports = {
   getRoomCheck: async (req, res) => {
@@ -627,6 +628,60 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+  repairInsData: async (req, res) => {
+    try {
+      const orderNumber = ["spi-336", "spi-337", "spi-338", "by air"];
+      const repairDb = new Crud();
+      const repairDb2 = new Crud();
+      repairDb.select(
+        "insId, partNumber, headerData, judgement, inspectionStep"
+      );
+
+      let response = await repairDb.get("t_inspection");
+      response = response.filter((r) => r.judgement != null);
+      response = await Promise.all(
+        response.map(async (resp) => {
+          const headerData = JSON.parse(resp.headerData);
+          resp.poNumber = headerData.poNumber || "";
+          return resp;
+        })
+      );
+      response = response.filter((r) =>
+        orderNumber.includes(r.poNumber.toLowerCase())
+      );
+      response = response.filter(
+        (r) =>
+          r.partNumber.startsWith("DU33") ||
+          r.partNumber.startsWith("TF-26F4") ||
+          r.partNumber.startsWith("17H37284D")
+      );
+
+      const ids = response.map((r) => r.insId);
+
+      // const query = `UPDATE t_inspection SET judgement = null WHERE insId IN (${ids
+      //   .map(() => "?")
+      //   .join(", ")});`;
+      // await database.promise().query(query, ids);
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  resetInspections: async (req, res) => {
+    try {
+      const database = require("../config/database");
+      const ids = req.body.ids;
+      const query = `UPDATE t_inspection SET judgement = null, done = 0 WHERE insId IN (${ids
+        .map(() => "?")
+        .join(", ")});`;
+      await database.promise().query(query, ids);
+      return res.status(200).json({});
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
     }
   },
 };
