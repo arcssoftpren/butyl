@@ -149,8 +149,8 @@
         @click="procceed"
       >
         Report NG
-      </v-btn> </v-col
-    >{{ inspection.partData.roomCheck }}
+      </v-btn>
+    </v-col>
   </v-row>
 </template>
 <script setup>
