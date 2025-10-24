@@ -1,5 +1,5 @@
 <template>
-  <v-table class="mytable mt-5">
+  <v-table class="mytable mt-5" v-if="inspection.partData.roomCheck == 1">
     <thead>
       <tr>
         <td colspan="2" class="text-center">Room Temperature</td>
@@ -131,11 +131,10 @@
     </v-col>
     <v-col cols="6">
       <v-btn
-        v-if="state == 1 && ff"
+        v-if="fn"
         variant="outlined"
         rounded="pill"
         block
-        :disabled="!complete"
         @click="procceed"
       >
         Submit Report
@@ -143,15 +142,15 @@
       <v-btn
         color="error"
         :disabled="incomplete"
-        v-if="!ff && inspection.outgoingData.roomData.input != ''"
+        v-if="!fn"
         variant="outlined"
         rounded="pill"
         block
         @click="procceed"
       >
         Report NG
-      </v-btn>
-    </v-col>
+      </v-btn> </v-col
+    >{{ inspection.partData.roomCheck }}
   </v-row>
 </template>
 <script setup>
@@ -168,6 +167,19 @@ const state = computed(() => {
       ? 1
       : 2
     : 0;
+});
+const fn = computed(() => {
+  const roomCheck = inspection.partData.roomCheck;
+  const roomJudgement = roomCheck
+    ? inspection.outgoingData.roomData.judgement
+    : true;
+
+  const outgoingJudgement = inspection.currentData.data.every((dataItem) => {
+    const filteredItems = dataItem.items.filter((it) => it.isCheck);
+    return filteredItems.every((it) => it.judgement === 1);
+  });
+
+  return outgoingJudgement && roomJudgement;
 });
 const props = defineProps(["inspectionData", "refresh", "roomCheck"]);
 const emits = defineEmits(["updateOutgoingJudgement", "refresh"]);
@@ -458,18 +470,18 @@ function procceed() {
       inspection.outgoingData.roomData.judgement
   );
 
-  inspection.judgement = outgoingJudgement ? 1 : 0;
+  inspection.judgement = fn.value ? 1 : 0;
 
-  console.log(outgoingJudgement);
+  console.log(inspection.judgement);
 
   // Simpan data dan lanjut ke step berikutnya
   let json = inspection.toJSON();
-  nextTick().then(async () => {
-    await store.ajax(json, "/inspection/save", "post");
-    // Update state setelah save
-    store.preload = false;
-    emits("refresh");
-  });
+  // nextTick().then(async () => {
+  //   await store.ajax(json, "/inspection/save", "post");
+  //   // Update state setelah save
+  //   store.preload = false;
+  //   emits("refresh");
+  // });
 }
 
 function saveCurrentData() {
