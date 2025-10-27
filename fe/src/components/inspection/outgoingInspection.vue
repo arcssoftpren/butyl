@@ -445,7 +445,7 @@ function populateInput() {
     dataItem.items.every((it) => it.input == "")
   );
 
-  emits("updateOutgoingJudgement", outgoingJudgement);
+  emits("updateOutgoingJudgement", fn.value);
 
   // Debug log
 }
@@ -476,12 +476,12 @@ function procceed() {
 
   // Simpan data dan lanjut ke step berikutnya
   let json = inspection.toJSON();
-  // nextTick().then(async () => {
-  //   await store.ajax(json, "/inspection/save", "post");
-  //   // Update state setelah save
-  //   store.preload = false;
-  //   emits("refresh");
-  // });
+  nextTick().then(async () => {
+    await store.ajax(json, "/inspection/save", "post");
+    // Update state setelah save
+    store.preload = false;
+    emits("refresh");
+  });
 }
 
 function saveCurrentData() {
