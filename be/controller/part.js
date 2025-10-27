@@ -367,15 +367,6 @@ module.exports = {
         })
       );
 
-      // const db2 = new Crud();
-      // const rr = await db2.get("t_inspection");
-
-      // console.log(
-      //   "[getInspections] Step: test Data",
-      //   Date.now() - startTime,
-      //   "ms"
-      // );
-
       return res.status(200).json(response);
     } catch (error) {
       console.log(error);
