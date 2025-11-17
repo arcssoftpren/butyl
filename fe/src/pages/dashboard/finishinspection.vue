@@ -241,27 +241,29 @@
                   v-show="selected.insData[`${process}Data`].insItem.length > 0"
                   :part-number="selected.insData.partData.partNumber"
                 />
-                <tr>
-                  <td style="border: none !important" colspan="17"></td>
-                </tr>
-                <tr>
-                  <td
-                    style="border: none !important"
-                    colspan="16"
-                    rowspan="3"
-                  ></td>
-                  <td class="text-center">Approved By</td>
-                </tr>
-                <tr>
-                  <td class="text-center">
-                    <v-img height="40" :src="approval.picData.sign"></v-img>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-center" style="font-size: 11pt">
-                    {{ approval.picData.userName }}
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td style="border: none !important" colspan="17"></td>
+                  </tr>
+                  <tr>
+                    <td
+                      style="border: none !important"
+                      colspan="16"
+                      rowspan="3"
+                    ></td>
+                    <td class="text-center">Approved By</td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <v-img height="40" :src="approval.picData.sign"></v-img>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center" style="font-size: 11pt">
+                      {{ approval.picData.userName }}
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
