@@ -363,6 +363,14 @@ module.exports = {
             resp[key] = value;
           });
 
+          if (func === "NG") {
+            let reject = Object.entries(resp.insData.rejectionData.data).filter(
+              ([key, v]) => v.length > 0
+            );
+            resp.rejectStep =
+              reject.length > 0 ? reject[reject.length - 1][0] : null;
+          }
+
           return resp;
         })
       );
@@ -676,6 +684,40 @@ module.exports = {
         .join(", ")});`;
       await database.promise().query(query, ids);
       return res.status(200).json({});
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+  batchDeleteInspections: async (req, res) => {
+    try {
+      const ids = req.body.batchArray;
+      const roleId = req.body.roleId;
+
+      const roleDb = new Crud();
+      roleDb.where("roleId", "=", roleId);
+      const roleData = await roleDb.get("t_role");
+
+      if (roleData.length === 0 || roleData[0].can_delete_inspection != 1) {
+        throw {
+          title: "Permission Denied",
+          text: "You do not have permission to delete inspections. Please contact the administrator.",
+          icon: "error",
+        };
+      }
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        throw {
+          title: "Invalid Input",
+          text: "The batch array must be a non-empty array of inspection IDs.",
+          icon: "error",
+        };
+      }
+
+      const sqlArray = ids.map(() => "?").join(", ");
+      const query = `DELETE FROM t_inspection WHERE insId IN (${sqlArray});`;
+      await database.promise().query(query, ids);
+      return res.status(200).json({ deleted: true });
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);

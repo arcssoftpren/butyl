@@ -39,6 +39,13 @@
       </template>
       <template #item="{ item, index }">
         <tr :class="item.judgement == 3 ? 'bg-pink-lighten-3 text-white' : ''">
+          <td class="text-center">
+            <v-checkbox-btn
+              :value="item.insId"
+              inline=""
+              v-model="batchDelete"
+            ></v-checkbox-btn>
+          </td>
           <td class="text-center" :key="item.partNumber">{{ index + 1 }}</td>
           <td :key="item.poNumber">
             {{ item.poNumber }}
@@ -97,6 +104,20 @@
       </template>
       <template #headers>
         <tr>
+          <th class="text-center">
+            <v-btn
+              icon
+              flat
+              size="small"
+              @click="
+                selectAll = !selectAll;
+                selectAllForDelete();
+              "
+            >
+              <v-icon v-if="!selectAll">mdi-check-all</v-icon>
+              <v-icon v-else>mdi-checkbox-blank-off</v-icon>
+            </v-btn>
+          </th>
           <th class="text-center">No</th>
           <th>
             PO Number <br />
@@ -114,6 +135,17 @@
           <th class="text-center">Header</th>
           <th class="text-center">Action</th>
         </tr>
+      </template>
+      <template #footer.prepend>
+        <v-btn
+          color="error"
+          prepend-icon="mdi-delete"
+          v-if="batchDelete.length > 0"
+          rounded="pill"
+          @click="deleteBatchDialog = true"
+          >Delete Checked</v-btn
+        >
+        <v-spacer></v-spacer>
       </template>
     </v-data-table>
     <v-dialog
@@ -175,6 +207,36 @@
         </template>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="deleteBatchDialog"
+      scrollable
+      persistent
+      :overlay="false"
+      max-width="500px"
+      transition="dialog-transition"
+    >
+      <v-card>
+        <template #title>Delete Inspections</template>
+        <template #text>
+          Are you sure you want to delete the selected inspections?
+        </template>
+        <template #actions>
+          <v-btn
+            color="error"
+            rounded="pill"
+            @click="
+              deleteBatchItems();
+              deleteBatchDialog = false;
+            "
+          >
+            Yes, Delete
+          </v-btn>
+          <v-btn rounded="pill" @click="deleteBatchDialog = false">
+            Cancel
+          </v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script setup>
@@ -182,6 +244,7 @@ import { useAppStore } from "@/stores/app";
 import moment from "moment";
 
 const store = useAppStore();
+const deleteBatchDialog = ref(false);
 const search = ref();
 const dialog = ref(false);
 const selected = ref(null);
@@ -192,6 +255,18 @@ const dialogData = reactive({
   title: "",
   subtitle: "",
 });
+
+const selectAll = ref(false);
+
+const batchDelete = ref([]);
+
+const selectAllForDelete = () => {
+  if (selectAll.value == false) {
+    batchDelete.value = [];
+    return;
+  }
+  batchDelete.value = inspections.value.map((i) => i.insId);
+};
 
 const openDialog = (key, item) => {
   dialogData.key = key;
@@ -283,4 +358,10 @@ function isValidJSONObject(str) {
     return false;
   }
 }
+
+const deleteBatchItems = async () => {
+  await store.asyncdeleteBatchItems(batchDelete.value);
+  batchDelete.value = [];
+  await refresh();
+};
 </script>

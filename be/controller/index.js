@@ -21,6 +21,10 @@ router.post("/auth/downloadbackup", auth.downloadBackup);
 router.post("/auth/deletebackup", auth.deleteBackup);
 router.post("/auth/restorebackup", auth.restoreBackup);
 router.post("/auth/getautobackup", auth.getautobackupData);
+router.post(
+  "/auth/toggledeleteinspectionright",
+  auth.toggleDeleteInspectionPermission
+);
 
 router.post("/inspection/logics", part.getLogics);
 router.post("/inspection/methods", part.getTools);
@@ -36,6 +40,7 @@ router.post("/inspection/", part.getInspections);
 router.post("/inspection/save", part.saveInspection);
 router.post("/inspection/editinstheader", part.editInstHeader);
 router.post("/inspection/getinspectiondata", part.getInspectionData);
+router.delete("/inspection/delete/batch", part.batchDeleteInspections);
 
 router.post("/parts/add", part.addPart);
 router.post("/parts/", part.getParts);

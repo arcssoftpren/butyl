@@ -39,6 +39,7 @@
           <th rowspan="2">#</th>
           <th rowspan="2">Role Name</th>
           <th rowspan="2">Home Page</th>
+          <th rowspan="2" class="text-center">Can Delete Inspection</th>
           <!-- <th colspan="2">Access Rights</th> -->
           <th rowspan="2" class="text-center">Actions</th>
         </tr>
@@ -52,6 +53,16 @@
           <td>{{ index + 1 }}</td>
           <td class="text-no-wrap">{{ item.roleName }}</td>
           <td class="text-no-wrap">{{ item.homePage }}</td>
+          <td class="text-center">
+            <v-checkbox-btn
+              inline
+              v-model:model-value="item.can_delete_inspection"
+              :true-value="1"
+              :false-value="0"
+              @change="toggleDeleteRight(item)"
+            >
+            </v-checkbox-btn>
+          </td>
           <!-- <td>
             <v-row class="">
               <v-col cols="6" v-for="acc in access.setups" :key="acc.path">
@@ -192,6 +203,25 @@ const dialogData = ref({
   icon: "mdi-new-box",
   key: "new",
 });
+
+const toggleDeleteRight = async (item) => {
+  try {
+    const { roleId, can_delete_inspection } = item;
+
+    console.log(roleId, can_delete_inspection);
+    store.preload = true;
+    await store.ajax(
+      { roleId, canDelete: can_delete_inspection },
+      "/auth/toggledeleteinspectionright",
+      "post"
+    );
+    store.roleUpdate++;
+    refresh();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const refresh = async () => {
   try {
     store.togglePreload(true);

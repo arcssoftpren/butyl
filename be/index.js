@@ -10,11 +10,13 @@ const app = express();
 app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 const fs = require("fs");
+const updateMigration = require("./dbupdatae/updateScript");
+updateMigration();
 
 const IP = process.env.SERVER_IP || "127.0.0.1";
 const PORT = process.env.SERVER_PORT || 3000;
 
-app.use(cors({ origin: "*", methods: ["POST", "GET"] }));
+app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE"] }));
 app.use(morgan("dev"));
 app.use(
   fileUpload({

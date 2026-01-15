@@ -1,6 +1,17 @@
 <template>
   <div>
     <v-data-table :items="inspections" :search="search">
+      <template #footer.prepend>
+        <v-btn
+          color="error"
+          prepend-icon="mdi-delete"
+          v-if="batchDelete.length > 0"
+          rounded="pill"
+          @click="deleteBatchDialog = true"
+          >Delete Checked</v-btn
+        >
+        <v-spacer></v-spacer>
+      </template>
       <template #top>
         <v-toolbar color="transparent">
           <template #title>
@@ -19,6 +30,13 @@
       </template>
       <template #item="{ item, index }">
         <tr>
+          <td class="text-center">
+            <v-checkbox-btn
+              :value="item.insId"
+              inline=""
+              v-model="batchDelete"
+            ></v-checkbox-btn>
+          </td>
           <td class="text-center" :key="item.partNumber">{{ index + 1 }}</td>
           <td :key="item.poNumber">
             {{ item.poNumber }}
@@ -68,6 +86,20 @@
         </tr>
       </template>
       <template #headers>
+        <th class="text-center">
+          <v-btn
+            icon
+            flat
+            size="small"
+            @click="
+              selectAll = !selectAll;
+              selectAllForDelete();
+            "
+          >
+            <v-icon v-if="!selectAll">mdi-check-all</v-icon>
+            <v-icon v-else>mdi-checkbox-blank-off</v-icon>
+          </v-btn>
+        </th>
         <tr>
           <th class="text-center">No</th>
           <th>
@@ -902,6 +934,37 @@
         </template>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+      v-model="deleteBatchDialog"
+      scrollable
+      persistent
+      :overlay="false"
+      max-width="500px"
+      transition="dialog-transition"
+    >
+      <v-card>
+        <template #title>Delete Inspections</template>
+        <template #text>
+          Are you sure you want to delete the selected inspections?
+        </template>
+        <template #actions>
+          <v-btn
+            color="error"
+            rounded="pill"
+            @click="
+              deleteBatchItems();
+              deleteBatchDialog = false;
+            "
+          >
+            Yes, Delete
+          </v-btn>
+          <v-btn rounded="pill" @click="deleteBatchDialog = false">
+            Cancel
+          </v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script setup>
@@ -925,6 +988,22 @@ const dialogData = reactive({
   title: "",
   subtitle: "",
 });
+
+const batchDelete = ref([]);
+const deleteBatchDialog = ref(false);
+const selectAll = ref(false);
+const selectAllForDelete = () => {
+  if (selectAll.value == false) {
+    batchDelete.value = [];
+    return;
+  }
+  batchDelete.value = inspections.value.map((i) => i.insId);
+};
+const deleteBatchItems = async () => {
+  await store.asyncdeleteBatchItems(batchDelete.value);
+  batchDelete.value = [];
+  await refresh();
+};
 
 const dataArr = ["kneading", "appearance", "extruding", "press", "outgoing"];
 

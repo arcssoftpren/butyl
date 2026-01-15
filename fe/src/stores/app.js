@@ -350,5 +350,17 @@ export const useAppStore = defineStore("app", {
         return false;
       }
     },
+    async asyncdeleteBatchItems(batchArray, url) {
+      try {
+        const roleId = this.userData.userRole;
+        await this.ajax(
+          { batchArray, roleId },
+          "/inspection/delete/batch",
+          "delete"
+        );
+      } catch (error) {
+        this.swal.fire(error);
+      }
+    },
   },
 });
