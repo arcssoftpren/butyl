@@ -51,6 +51,11 @@ be/backups/
 be/tempbackup/
 be/uploads/
 
+be/autobackup/*
+be/backups/*
+be/tempbackup/*
+be/uploads/*
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
