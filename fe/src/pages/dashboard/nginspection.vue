@@ -139,8 +139,10 @@
                 :close-me="refresh"
                 @submit-data="emited"
                 :all-data="selected"
-                :items="selected.rejectionData.data"
               ></ngPreview>
+              <!-- 
+              :items="rejectionData.value.data"
+                 -->
             </div>
           </div>
         </template>
@@ -210,7 +212,7 @@ const deleteBatchItems = async () => {
   await refresh();
 };
 
-const openDialog = (key, item) => {
+const openDialog = async (key, item) => {
   dialogData.key = key;
   switch (key) {
     case "new":
@@ -218,19 +220,19 @@ const openDialog = (key, item) => {
       dialogData.subtitle = "Please fill all required data.";
       break;
     case "open":
-      let data = {
-        ...item.insData,
-        headerData: item.headerData,
-        insId: item.insId,
-        judgement: item.judgement,
-        partNumber: item.partNumber,
-        inspectionStep: item.inspectionStep,
-        rejectStep: item.rejectStep,
-      };
-      selected.value = data;
+      // let data = {
+      //   ...instData,
+      //   headerData: item.headerData,
+      //   insId: item.insId,
+      //   judgement: item.judgement,
+      //   partNumber: item.partNumber,
+      //   inspectionStep: item.inspectionStep,
+      //   rejectStep: item.rejectStep,
+      // };
+
+      selected.value = item;
 
       const step = item.inspectionStep.step;
-
       break;
     case "delete":
       selected.value = item;

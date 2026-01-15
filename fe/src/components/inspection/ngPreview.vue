@@ -280,9 +280,19 @@ let localData2 = ref({});
 
 const user = store.userData.userName;
 
-function refresh() {
-  localData.value = JSON.parse(JSON.stringify(toRaw(props.items)));
+async function refresh() {
+  // localData.value = JSON.parse(JSON.stringify(toRaw(props.items)));
   localData2.value = JSON.parse(JSON.stringify(toRaw(props.allData)));
+  const instData = await store.ajax(
+    {},
+    `/inspection/rejection/${props.allData.insId}`,
+    "get"
+  );
+
+  localData2.value = { ...localData2.value, ...instData };
+  localData.value = instData.rejectionData.data;
+
+  store.preload = false;
 
   // if (localData2.value.rejectStep == "appearance") {
   //   let vv = {};

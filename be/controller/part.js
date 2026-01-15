@@ -334,7 +334,7 @@ module.exports = {
           );
           break;
         case "NG":
-          db.select("insData");
+          // db.select("insData");
           db.where("judgement", "=", 0);
           response = await db.get("t_inspection");
           break;
@@ -350,6 +350,14 @@ module.exports = {
           break;
       }
 
+      const stepArr = [
+        "appearance",
+        "extruding",
+        "kneading",
+        "press",
+        "outgoing",
+      ];
+
       response = await Promise.all(
         response.map((resp) => {
           Object.entries(resp).forEach(([key, value]) => {
@@ -363,19 +371,54 @@ module.exports = {
             resp[key] = value;
           });
 
-          if (func === "NG") {
-            let reject = Object.entries(resp.insData.rejectionData.data).filter(
-              ([key, v]) => v.length > 0
-            );
-            resp.rejectStep =
-              reject.length > 0 ? reject[reject.length - 1][0] : null;
-          }
+          console.log(resp.inspectionStep);
+
+          const index = stepArr.indexOf(resp.inspectionStep.step);
+          const prevStep = index > 0 ? stepArr[index - 1] : null;
+          console.log(prevStep);
+
+          resp.rejectStep =
+            resp.inspectionStep.n > 1 ? resp.inspectionStep.step : prevStep;
+
+          // if (func === "NG") {
+          //   let reject = Object.entries(resp.insData.rejectionData.data).filter(
+          //     ([key, v]) => v.length > 0
+          //   );
+          //   resp.rejectStep =
+          //     reject.length > 0 ? reject[reject.length - 1][0] : null;
+          // }
 
           return resp;
         })
       );
 
       return res.status(200).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+
+  getRejectionData: async (req, res) => {
+    try {
+      const insId = req.params.insId;
+      const db = new Crud();
+      db.select("insData");
+      db.where("insId", "=", insId);
+      let response = await db.get("t_inspection");
+
+      response = await Promise.all(
+        response.map((resp) => {
+          Object.entries(resp).forEach(([key, value]) => {
+            const parsable = isValidJSONObject(value);
+            if (parsable) {
+              resp[key] = JSON.parse(value);
+            }
+          });
+          return resp;
+        })
+      );
+      return res.status(200).json(response[0].insData);
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);
