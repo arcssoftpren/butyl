@@ -41,8 +41,8 @@ build/Release
 node_modules/
 jspm_packages/
 
-be/patch/
-be/patch/*
+patch/
+patch/*
 
 updater_helper/
 
