@@ -212,7 +212,6 @@ const downloadExcel = async () => {
     parts.value.map(async (part) => {
       return {
         "Part Number": part.partNumber,
-        "Part Name": part.partName,
         Customer: part.customer,
       };
     }),
