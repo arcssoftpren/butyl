@@ -771,7 +771,7 @@ module.exports = {
       const { insId, step } = req.body;
       const db = new Crud();
       console.log("Rollback Reject for insId:", insId, "at step:", step);
-      db.select("insData");
+      db.select("insData", "inspectionStep");
       db.where("insId", "=", insId);
       let inspection = await db.get("t_inspection");
       inspection = inspection[0];
