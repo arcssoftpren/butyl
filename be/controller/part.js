@@ -324,6 +324,7 @@ module.exports = {
       const { func, partNumber } = req.body;
       const db = new Crud();
       db.select("insId, headerData, partNumber, judgement, inspectionStep");
+      db.orderBy("insId", "DESC");
       let response;
 
       switch (func) {
@@ -801,6 +802,39 @@ module.exports = {
       await db2.update("t_inspection", data);
 
       return res.status(200).json({ message: "Rollback successful" });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+
+  removePicture: async (req, res) => {
+    try {
+      const { pictureType } = req.body;
+      const { partNumber } = req.params;
+      let filePath = "";
+      console.log("Picture type to be removed:", pictureType);
+
+      if (pictureType === "drawing") {
+        filePath = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_drawing.png`,
+        );
+      } else if (pictureType === "actual") {
+        filePath = path.join(
+          __dirname,
+          "../uploads/drawings/",
+          `${partNumber}_actual.png`,
+        );
+      }
+
+      console.log("File path to be deleted:", filePath);
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      return res.status(200).json({ success: true });
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);

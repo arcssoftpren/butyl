@@ -18,23 +18,6 @@
     </v-stepper-header>
     <v-stepper-window>
       <v-stepper-window-item value="1">
-        <v-file-input
-          v-model="formData.partDrawing"
-          class="d-none"
-          type="file"
-          variant="outlined"
-          rounded="pill"
-          density="compact"
-          ref="partDrawing"
-        />
-        <v-file-input
-          v-model="formData.actImage"
-          class="d-none"
-          variant="outlined"
-          rounded="pill"
-          density="compact"
-          ref="actImage"
-        />
         <v-row>
           <v-col cols="4">
             <v-card height="447" title="Part Identity">
@@ -112,12 +95,31 @@
                         </v-btn>
                       </template>
                       <template #text>
+                        <v-file-input
+                          v-model="formData.partDrawing"
+                          type="file"
+                          variant="outlined"
+                          rounded="pill"
+                          density="compact"
+                          ref="partDrawing"
+                          class="d-none"
+                        />
                         <v-img
                           height="225"
                           :src="
                             partDrawingUrl == null ? defDrawing : partDrawingUrl
                           "
                         ></v-img>
+                        <v-divider class="my-2"></v-divider>
+                        <v-btn
+                          :disabled="partDrawingUrl == null"
+                          variant="outlined"
+                          rounded="pill"
+                          block
+                          @click="removePicture('drawing')"
+                        >
+                          Remove Picture
+                        </v-btn>
                       </template>
                     </v-card>
                   </v-col>
@@ -133,10 +135,29 @@
                         </v-btn>
                       </template>
                       <template #text>
+                        <v-file-input
+                          v-model="formData.actImage"
+                          variant="outlined"
+                          rounded="pill"
+                          density="compact"
+                          ref="actImage"
+                          class="d-none"
+                        />
                         <v-img
                           height="225"
                           :src="actImageUrl == null ? defDrawing : actImageUrl"
                         ></v-img>
+
+                        <v-divider class="my-2"></v-divider>
+                        <v-btn
+                          :disabled="actImageUrl == null"
+                          variant="outlined"
+                          rounded="pill"
+                          block
+                          @click="removePicture('actual')"
+                        >
+                          Remove Picture
+                        </v-btn>
                       </template>
                     </v-card>
                   </v-col>
@@ -1681,7 +1702,7 @@
                               item.logic.id,
                               item.standard,
                               "",
-                              true
+                              true,
                             )
                           }}
                           {{ item.unit }}
@@ -1839,7 +1860,7 @@
                               item.logic.id,
                               item.standard,
                               "",
-                              true
+                              true,
                             )
                           }}
                           {{ item.unit }}
@@ -1868,7 +1889,7 @@
                               item.logic.id,
                               item.standard,
                               "",
-                              true
+                              true,
                             )
                           }}
                           {{ item.unit }}
@@ -1897,7 +1918,7 @@
                               item.logic.id,
                               item.standard,
                               "",
-                              true
+                              true,
                             )
                           }}
                           {{ item.unit }}
@@ -2020,7 +2041,7 @@ watch(
     } else {
       partDrawingUrl.value = await store.fileToDataURL(e);
     }
-  }
+  },
 );
 watch(
   () => formData.actImage,
@@ -2030,7 +2051,7 @@ watch(
     } else {
       actImageUrl.value = await store.fileToDataURL(e);
     }
-  }
+  },
 );
 const structure = {};
 
@@ -2056,28 +2077,28 @@ const rules1 = {
     required: helpers.withMessage("This field is required", required),
     minValue: helpers.withMessage(
       "Plese fill value greater than 0",
-      minValue(1)
+      minValue(1),
     ),
   },
   width: {
     required: helpers.withMessage("This field is required", required),
     minValue: helpers.withMessage(
       "Plese fill value greater than 0",
-      minValue(1)
+      minValue(1),
     ),
   },
   length: {
     required: helpers.withMessage("This field is required", required),
     minValue: helpers.withMessage(
       "Plese fill value greater than 0",
-      minValue(1)
+      minValue(1),
     ),
   },
   sg: {
     required: helpers.withMessage("This field is required", required),
     minValue: helpers.withMessage(
       "Plese fill value greater than 0",
-      minValue(1)
+      minValue(1),
     ),
   },
 };
@@ -2183,7 +2204,7 @@ watch(
         });
       }
     }
-  }
+  },
 );
 
 watch(
@@ -2210,7 +2231,7 @@ watch(
     } else {
       formData.pressItems = [];
     }
-  }
+  },
 );
 
 watch(
@@ -2237,7 +2258,7 @@ watch(
     } else {
       formData.outgoingItems = [];
     }
-  }
+  },
 );
 
 function moveKeyUp(arr, index) {
@@ -2367,7 +2388,7 @@ const refresh = async () => {
   const images = await store.ajax(
     { partNumber: formData.partNumber },
     "/parts/getdrawing",
-    "post"
+    "post",
   );
 
   actImageUrl.value = images.act;
@@ -2452,6 +2473,30 @@ const submit = async () => {
   } catch (error) {
     console.log(error);
     store.preload = false;
+  }
+};
+
+const removePicture = async (type) => {
+  try {
+    await store.ajax(
+      {
+        partNumber: formData.partNumber,
+        pictureType: type,
+      },
+      `/parts/picture/${formData.partNumber}`,
+      "post",
+    );
+
+    if (type === "drawing") {
+      formData.partDrawing = null;
+      partDrawingUrl.value = defDrawing.value;
+    } else if (type === "actual") {
+      formData.actImage = null;
+      actImageUrl.value = defDrawing.value;
+    }
+    store.preload = false;
+  } catch (error) {
+    console.log(error);
   }
 };
 </script>

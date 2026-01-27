@@ -86,21 +86,21 @@
         </tr>
       </template>
       <template #headers>
-        <th class="text-center">
-          <v-btn
-            icon
-            flat
-            size="small"
-            @click="
-              selectAll = !selectAll;
-              selectAllForDelete();
-            "
-          >
-            <v-icon v-if="!selectAll">mdi-check-all</v-icon>
-            <v-icon v-else>mdi-checkbox-blank-off</v-icon>
-          </v-btn>
-        </th>
         <tr>
+          <th class="text-center">
+            <v-btn
+              icon
+              flat
+              size="small"
+              @click="
+                selectAll = !selectAll;
+                selectAllForDelete();
+              "
+            >
+              <v-icon v-if="!selectAll">mdi-check-all</v-icon>
+              <v-icon v-else>mdi-checkbox-blank-off</v-icon>
+            </v-btn>
+          </th>
           <th class="text-center">No</th>
           <th>
             PO Number <br />
@@ -196,7 +196,7 @@
                                 item.logic.id,
                                 item.standard,
                                 "",
-                                true
+                                true,
                               )
                             }}
                           </td>
@@ -257,7 +257,7 @@
                                   <td>
                                     {{
                                       moment(
-                                        selected.kneadingData.kneadingQlt.date
+                                        selected.kneadingData.kneadingQlt.date,
                                       ).format("DD/MM/YYYY")
                                     }}
                                   </td>
@@ -309,7 +309,7 @@
                                 item.logic.id,
                                 item.standard,
                                 "",
-                                true
+                                true,
                               )
                             }}
                             {{ item.unit }}
@@ -472,7 +472,7 @@
                                     rejitem.logic.id,
                                     rejitem.standard,
                                     "",
-                                    true
+                                    true,
                                   )
                                 }}
                                 {{ rejitem.unit }}
@@ -495,7 +495,7 @@
                               <td>
                                 {{
                                   moment(rejitem.reviewDate).format(
-                                    "DD/MM/YYYY"
+                                    "DD/MM/YYYY",
                                   )
                                 }}
                               </td>
@@ -723,7 +723,7 @@
                                   <td>
                                     {{
                                       moment(item.reviewDate).format(
-                                        "DD/MM/YYYY"
+                                        "DD/MM/YYYY",
                                       )
                                     }}
                                   </td>
