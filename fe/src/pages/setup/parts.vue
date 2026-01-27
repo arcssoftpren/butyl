@@ -16,15 +16,22 @@
             />
           </template>
           <template #append>
-            <v-btn
-              @click="openDialog"
-              density="compact"
-              variant="outlined"
-              icon
-              class="mt-2 ms-2"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
+            <v-btn-group variant="outlined">
+              <v-btn
+                @click="openDialog"
+                prepend-icon="mdi-plus"
+                class="mt-2 ms-2"
+              >
+                Add New Part
+              </v-btn>
+              <v-btn
+                @click="downloadExcel"
+                prepend-icon="mdi-download"
+                class="mt-2 ms-2"
+              >
+                Download List
+              </v-btn>
+            </v-btn-group>
           </template>
         </v-toolbar>
         <v-divider class="my-2"></v-divider>
@@ -146,6 +153,7 @@
 </template>
 <script setup>
 import { useAppStore } from "@/stores/app";
+import * as XLSX from "xlsx";
 
 const store = useAppStore();
 const dialog = ref(false);
@@ -186,7 +194,6 @@ const refresh = async () => {
   try {
     parts.value = await store.ajax({}, "/parts", "post");
     dialog.value = false;
-    console.log(parts.value);
     store.preload = false;
   } catch (error) {}
 };
@@ -199,4 +206,28 @@ const deletePart = async () => {
 onBeforeMount(() => {
   refresh();
 });
+
+const downloadExcel = async () => {
+  const downloadData = await Promise.all(
+    parts.value.map(async (part) => {
+      return {
+        "Part Number": part.partNumber,
+        "Part Name": part.partName,
+        Customer: part.customer,
+      };
+    }),
+  );
+
+  // Convert to Excel format using xlsx
+  const ws = XLSX.utils.json_to_sheet(downloadData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Parts List");
+
+  // Set column widths
+  ws["!cols"] = [{ wch: 20 }, { wch: 30 }, { wch: 25 }];
+
+  // Download file
+  const fileName = `Parts_List_${new Date().toISOString().split("T")[0]}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+};
 </script>
