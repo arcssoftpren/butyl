@@ -44,7 +44,7 @@ jspm_packages/
 patch/
 patch/*
 
-updater_helper/
+rollback/
 
 be/autobackup/
 be/backups/

@@ -59,13 +59,13 @@ module.exports = {
         const filePath = path.join(
           __dirname,
           "../uploads/drawings/",
-          `${partNumber}_drawing.png`
+          `${partNumber}_drawing.png`,
         );
 
         const filePath2 = path.join(
           __dirname,
           "../uploads/drawings/",
-          `${partNumber}_actual.png`
+          `${partNumber}_actual.png`,
         );
 
         if (uploadedFile) {
@@ -116,7 +116,7 @@ module.exports = {
             }
           });
           return part;
-        })
+        }),
       );
       return res.status(200).json(parts);
     } catch (error) {
@@ -202,13 +202,13 @@ module.exports = {
         const filePath = path.join(
           __dirname,
           "../uploads/drawings/",
-          `${partNumber}_drawing.png`
+          `${partNumber}_drawing.png`,
         );
 
         const filePath2 = path.join(
           __dirname,
           "../uploads/drawings/",
-          `${partNumber}_actual.png`
+          `${partNumber}_actual.png`,
         );
 
         if (uploadedFile) {
@@ -330,7 +330,7 @@ module.exports = {
         case "neutral":
           response = await db.get("t_inspection");
           response = response.filter(
-            (r) => r.judgement === null || r.judgement === 3
+            (r) => r.judgement === null || r.judgement === 3,
           );
           break;
         case "NG":
@@ -389,7 +389,7 @@ module.exports = {
           // }
 
           return resp;
-        })
+        }),
       );
 
       return res.status(200).json(response);
@@ -416,7 +416,7 @@ module.exports = {
             }
           });
           return resp;
-        })
+        }),
       );
       return res.status(200).json(response[0].insData);
     } catch (error) {
@@ -445,7 +445,7 @@ module.exports = {
           });
 
           return resp;
-        })
+        }),
       );
       return res.status(200).json(response);
     } catch (error) {
@@ -520,7 +520,7 @@ module.exports = {
           e.outGoingOn = e.outGoingOn == 1;
           e.heaterOn = e.heaterOn == 1;
           return e;
-        })
+        }),
       );
       return res.status(200).json(types);
     } catch (error) {
@@ -594,7 +594,7 @@ module.exports = {
         "left",
         "inspection_logic",
         "inspection_logic.id",
-        "t_insitem.logic"
+        "t_insitem.logic",
       );
       const items = await db.get("t_insitem");
 
@@ -648,7 +648,7 @@ module.exports = {
         await database
           .promise()
           .query(
-            `ALTER TABLE t_inspection ADD COLUMN done TINYINT(1) DEFAULT 0;`
+            `ALTER TABLE t_inspection ADD COLUMN done TINYINT(1) DEFAULT 0;`,
           );
 
         const dbi = new Crud();
@@ -661,7 +661,7 @@ module.exports = {
               dbu.where("insId", "=", item.insId);
               await dbu.update("t_inspection", { done: 1 });
             }
-          })
+          }),
         );
         return res.status(200).json({ updated: true });
       } else {
@@ -684,13 +684,13 @@ module.exports = {
       const repairDb = new Crud();
       const repairDb2 = new Crud();
       repairDb.select(
-        "insId, t_inspection.partNumber, headerData, judgement, inspectionStep, partType"
+        "insId, t_inspection.partNumber, headerData, judgement, inspectionStep, partType",
       );
       repairDb.join(
         "left",
         "t_part",
         "t_part.partNumber",
-        "t_inspection.partNumber"
+        "t_inspection.partNumber",
       );
       let response = await repairDb.get("t_inspection");
       response = response.filter((r) => r.judgement != null);
@@ -699,10 +699,10 @@ module.exports = {
           const headerData = JSON.parse(resp.headerData);
           resp.poNumber = headerData.poNumber || "";
           return resp;
-        })
+        }),
       );
       response = response.filter((r) =>
-        orderNumber.includes(r.poNumber.toLowerCase())
+        orderNumber.includes(r.poNumber.toLowerCase()),
       );
       response = response.filter((r) => r.partType === 9 || r.partType === 8);
 
@@ -761,6 +761,44 @@ module.exports = {
       const query = `DELETE FROM t_inspection WHERE insId IN (${sqlArray});`;
       await database.promise().query(query, ids);
       return res.status(200).json({ deleted: true });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(error);
+    }
+  },
+  rollBackReject: async (req, res) => {
+    try {
+      const { insId, step } = req.body;
+      const db = new Crud();
+      console.log("Rollback Reject for insId:", insId, "at step:", step);
+      db.select("insData");
+      db.where("insId", "=", insId);
+      let inspection = await db.get("t_inspection");
+      inspection = inspection[0];
+      let insData = JSON.parse(inspection.insData);
+      insData.rejectionData.data = {
+        kneading: [],
+        appearance: [],
+        extruding: [],
+        press: [],
+        outgoing: [],
+      };
+
+      if (step === "appearance") {
+        // do nothing more
+        const backtoNeutral = { step: "appearance", n: 1 };
+        insData.inspectionStep = backtoNeutral;
+      }
+
+      const db2 = new Crud();
+      db2.where("insId", "=", insId);
+      await db2.update("t_inspection", {
+        insData: JSON.stringify(insData),
+        judgement: null,
+        inspectionStep: JSON.stringify(insData.inspectionStep),
+      });
+
+      return res.status(200).json({ message: "Rollback successful" });
     } catch (error) {
       console.log(error);
       return res.status(400).json(error);

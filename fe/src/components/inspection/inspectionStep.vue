@@ -510,7 +510,9 @@
     <v-divider class="my-2"></v-divider>
     <v-btn
       :color="appearanceValid ? 'success' : 'error'"
-      @click="appProceed"
+      @click="
+        inspection.currentData.judgement ? appProceed() : initreportNg(true)
+      "
       :variant="appearanceValid ? 'outlined' : 'flat'"
       rounded="pill"
       block
@@ -652,7 +654,9 @@
           rounded="pill"
           block
           :text="inspection.currentData.judgement ? 'next' : 'Report NG'"
-          @click="procceed"
+          @click="
+            inspection.currentData.judgement ? procceed() : initreportNg()
+          "
         ></v-btn>
       </v-col>
       <v-col cols="6" v-else>
@@ -674,7 +678,9 @@
               rounded="pill"
               block
               :text="inspection.currentData.judgement ? 'next' : 'Report NG'"
-              @click="procceed"
+              @click="
+                inspection.currentData.judgement ? procceed() : initreportNg()
+              "
             ></v-btn>
           </v-col>
         </v-row>
@@ -774,7 +780,7 @@ onBeforeMount(async () => {
   const images = await store.ajax(
     { partNumber: inspection.partNumber },
     "/parts/getdrawing",
-    "post"
+    "post",
   );
 
   act.value = images.act;
@@ -788,7 +794,7 @@ function validateAppearance() {
     inspection.appearanceData.data[key].judgement = store.checkLogic(
       8,
       [inspection.appearanceData.standard[key]],
-      inspection.appearanceData.data[key].input
+      inspection.appearanceData.data[key].input,
     );
   });
 
@@ -796,12 +802,12 @@ function validateAppearance() {
     inspection.appearanceData.data.heaterTemp.judgement = store.checkLogic(
       2,
       inspection.appearanceData.standard.heaterTemp,
-      inspection.appearanceData.data.heaterTemp.input
+      inspection.appearanceData.data.heaterTemp.input,
     );
   }
 
   let valid = Object.entries(inspection.appearanceData.data).every(
-    ([key, value]) => value.judgement
+    ([key, value]) => value.judgement,
   );
 
   appearanceValid.value = valid;
@@ -879,7 +885,7 @@ function validateInput(index, Yindex) {
 
   // Cek apakah item sudah ada di dalam rejectionArray
   const existingIndex = rejectionArray.findIndex(
-    (i) => i.key == key && i.id == item.id
+    (i) => i.key == key && i.id == item.id,
   );
 
   if (judgement === 0) {
@@ -903,7 +909,7 @@ function validateInput(index, Yindex) {
 function populateInput() {
   const data = inspection.currentData.data;
   const index = data.findIndex(
-    (e) => e.key == `N${inspection.inspectionStep.n}`
+    (e) => e.key == `N${inspection.inspectionStep.n}`,
   );
 
   const items = data[index].items;
@@ -922,7 +928,7 @@ function populateInput() {
       roomData.judgement = store.checkLogic(
         roomData.logic,
         roomData.standard,
-        roomData.input
+        roomData.input,
       );
       roomValid.value = roomData.judgement;
     }
@@ -960,7 +966,7 @@ function appProceed() {
 function procceed() {
   const data = inspection.currentData.data;
   const index = data.findIndex(
-    (e) => e.key == `N${inspection.inspectionStep.n}`
+    (e) => e.key == `N${inspection.inspectionStep.n}`,
   );
   const items = data[index].items;
   let filtered = items.filter((e) => e.isCheck);
@@ -1057,7 +1063,7 @@ function procceed() {
 function saveCurrentData() {
   const data = inspection.currentData.data;
   const index = data.findIndex(
-    (e) => e.key == `N${inspection.inspectionStep.n}`
+    (e) => e.key == `N${inspection.inspectionStep.n}`,
   );
   const items = data[index].items;
   let filtered = items.filter((e) => e.isCheck);
@@ -1098,4 +1104,29 @@ function getBg(item) {
   ];
   return classes[response.findIndex((e) => e)];
 }
+
+const initreportNg = (app) => {
+  console.log("init report ng");
+  store.swal
+    .fire({
+      title: "Report NG?",
+      text: "Are you sure you want to report this inspection as NG?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, report NG",
+      cancelButtonText: "Cancel",
+      position: "center",
+      timer: 0,
+      showConfirmButton: true,
+    })
+    .then(async (result) => {
+      if (result.isConfirmed) {
+        if (app) {
+          appProceed();
+          return;
+        }
+        procceed();
+      }
+    });
+};
 </script>

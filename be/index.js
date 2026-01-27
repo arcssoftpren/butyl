@@ -16,12 +16,12 @@ updateMigration();
 const IP = process.env.SERVER_IP || "127.0.0.1";
 const PORT = process.env.SERVER_PORT || 3000;
 
-app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE"] }));
+app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE", "PUT"] }));
 app.use(morgan("dev"));
 app.use(
   fileUpload({
     createParentPath: true,
-  })
+  }),
 );
 
 const cron = require("node-cron");

@@ -53,14 +53,10 @@
             {{ item.rejectStep }}
           </td>
           <td class="text-center">
-            <v-btn
-              density="compact"
-              variant="outlined"
-              rounded="pill"
-              block
-              @click="openDialog('open', item)"
-              >Check</v-btn
-            >
+            <v-btn-group density="compact" variant="outlined" rounded="pill">
+              <v-btn @click="openDialog('open', item)">Check</v-btn>
+              <v-btn @click="initRollback(item)">Roll Back</v-btn>
+            </v-btn-group>
           </td>
         </tr>
       </template>
@@ -290,4 +286,42 @@ const emited = async (data) => {
 onBeforeMount(() => {
   refresh();
 });
+
+const rollbackReject = async (item) => {
+  try {
+    await store.ajax(
+      { insId: item.insId, step: item.rejectStep },
+      "/rejection/rollback",
+      "put",
+    );
+    store.swal.fire({
+      icon: "success",
+      title: "Success",
+      text: "Rejection rolled back successfully.",
+    });
+    await refresh();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const initRollback = (item) => {
+  store.swal
+    .fire({
+      title: "Are you sure?",
+      text: "You are about to roll back the rejection. This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, roll back",
+      cancelButtonText: "Cancel",
+      position: "center",
+      timer: 0,
+      showConfirmButton: true,
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        rollbackReject(item);
+      }
+    });
+};
 </script>

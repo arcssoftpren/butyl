@@ -146,7 +146,7 @@
         variant="outlined"
         rounded="pill"
         block
-        @click="procceed"
+        @click="initreportNg"
       >
         Report NG
       </v-btn>
@@ -161,7 +161,7 @@ import moment from "moment";
 const store = useAppStore();
 const state = computed(() => {
   return inspection.currentData.data.every((dataItem) =>
-    dataItem.items.every((it) => it.judgement === 1)
+    dataItem.items.every((it) => it.judgement === 1),
   )
     ? complete.value
       ? 1
@@ -200,8 +200,8 @@ let ff = computed(() =>
   inspection.currentData.data.every(
     (dataItem) =>
       dataItem.items.every((it) => it.judgement === 1) &&
-      inspection.outgoingData.roomData.judgement
-  )
+      inspection.outgoingData.roomData.judgement,
+  ),
 );
 let incomplete = ref(false);
 
@@ -264,7 +264,7 @@ onBeforeMount(async () => {
   const images = await store.ajax(
     { partNumber: inspection.partNumber },
     "/parts/getdrawing",
-    "post"
+    "post",
   );
 
   act.value = images.act;
@@ -278,7 +278,7 @@ function validateAppearance() {
     inspection.appearanceData.data[key].judgement = store.checkLogic(
       8,
       [inspection.appearanceData.standard[key]],
-      inspection.appearanceData.data[key].input
+      inspection.appearanceData.data[key].input,
     );
   });
 
@@ -286,12 +286,12 @@ function validateAppearance() {
     inspection.appearanceData.data.heaterTemp.judgement = store.checkLogic(
       2,
       inspection.appearanceData.standard.heaterTemp,
-      inspection.appearanceData.data.heaterTemp.input
+      inspection.appearanceData.data.heaterTemp.input,
     );
   }
 
   let valid = Object.entries(inspection.appearanceData.data).every(
-    ([key, value]) => value.judgement
+    ([key, value]) => value.judgement,
   );
 
   appearanceValid.value = valid;
@@ -370,7 +370,7 @@ function validateInput(index, Yindex) {
 
   // Cek apakah item sudah ada di dalam rejectionArray
   const existingIndex = rejectionArray.findIndex(
-    (i) => i.key == key && i.id == item.id
+    (i) => i.key == key && i.id == item.id,
   );
 
   if (judgement === 0) {
@@ -394,7 +394,7 @@ function validateInput(index, Yindex) {
 function populateInput() {
   const data = inspection.currentData.data;
   const index = data.findIndex(
-    (e) => e.key == `N${inspection.inspectionStep.n}`
+    (e) => e.key == `N${inspection.inspectionStep.n}`,
   );
 
   const items = data[index].items;
@@ -413,7 +413,7 @@ function populateInput() {
       roomData.judgement = store.checkLogic(
         roomData.logic,
         roomData.standard,
-        roomData.input
+        roomData.input,
       );
       roomValid.value = roomData.judgement;
     }
@@ -438,11 +438,11 @@ function populateInput() {
 
   complete.value =
     inspection.currentData.data.every((dataItem) =>
-      dataItem.items.every((it) => it.input != "")
+      dataItem.items.every((it) => it.input != ""),
     ) && inspection.outgoingData.roomData.input != "";
 
   incomplete.value = inspection.currentData.data.every((dataItem) =>
-    dataItem.items.every((it) => it.input == "")
+    dataItem.items.every((it) => it.input == ""),
   );
 
   emits("updateOutgoingJudgement", fn.value);
@@ -467,7 +467,7 @@ function procceed() {
   const outgoingJudgement = inspection.currentData.data.every(
     (dataItem) =>
       dataItem.items.every((it) => it.judgement === 1) &&
-      inspection.outgoingData.roomData.judgement
+      inspection.outgoingData.roomData.judgement,
   );
 
   inspection.judgement = fn.value ? 1 : 0;
@@ -487,7 +487,7 @@ function procceed() {
 function saveCurrentData() {
   const data = inspection.currentData.data;
   const index = data.findIndex(
-    (e) => e.key == `N${inspection.inspectionStep.n}`
+    (e) => e.key == `N${inspection.inspectionStep.n}`,
   );
   const userData = store.userData;
   const { userName, userId } = userData;
@@ -525,4 +525,24 @@ function getBg(item) {
   ];
   return classes[response.findIndex((e) => e)];
 }
+
+const initreportNg = () => {
+  store.swal
+    .fire({
+      title: "Report NG?",
+      text: "Are you sure you want to report this inspection as NG?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, report NG",
+      cancelButtonText: "Cancel",
+      position: "center",
+      timer: 0,
+      showConfirmButton: true,
+    })
+    .then(async (result) => {
+      if (result.isConfirmed) {
+        procceed();
+      }
+    });
+};
 </script>

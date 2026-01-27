@@ -65,10 +65,10 @@ export const useAppStore = defineStore("app", {
       },
       customClass: {
         container: "swal-custom-zindex",
-        cancelButton:
-          "swal-btn swal-btn-cancel v-btn v-theme--light v-btn--density-default rounded-pill v-btn--size-default v-btn--variant-outlined",
-        confirmButton:
-          "swal-btn swal-btn-confirm text-error v-btn v-theme--light v-btn--density-default rounded-pill v-btn--size-default v-btn--variant-outlined",
+        // cancelButton:
+        //   "swal-btn swal-btn-cancel v-btn v-theme--light v-btn--density-default rounded-pill v-btn--size-default v-btn--variant-outlined",
+        // confirmButton:
+        //   "swal-btn swal-btn-confirm text-error v-btn v-theme--light v-btn--density-default rounded-pill v-btn--size-default v-btn--variant-outlined",
       },
     }),
     setups: [
@@ -356,7 +356,7 @@ export const useAppStore = defineStore("app", {
         await this.ajax(
           { batchArray, roleId },
           "/inspection/delete/batch",
-          "delete"
+          "delete",
         );
       } catch (error) {
         this.swal.fire(error);
