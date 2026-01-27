@@ -770,12 +770,13 @@ module.exports = {
     try {
       const { insId, step } = req.body;
       const db = new Crud();
-      console.log("Rollback Reject for insId:", insId, "at step:", step);
-      db.select("insData", "inspectionStep");
+      db.select(["insData", "inspectionStep", "partNumber"]);
       db.where("insId", "=", insId);
       let inspection = await db.get("t_inspection");
       inspection = inspection[0];
       let insData = JSON.parse(inspection.insData);
+
+      // Clear all rejection data
       insData.rejectionData.data = {
         kneading: [],
         appearance: [],
@@ -784,19 +785,20 @@ module.exports = {
         outgoing: [],
       };
 
-      if (step === "appearance") {
-        // do nothing more
-        const backtoNeutral = { step: "appearance", n: 1 };
-        insData.inspectionStep = backtoNeutral;
-      }
+      // Kembali ke step saat NG dilaporkan (bukan step sebelumnya)
+      // Dengan n=1 untuk memulai ulang dari awal step tersebut
+      const backToCurrentStep = { step: step, n: 1 };
 
       const db2 = new Crud();
-      db2.where("insId", "=", insId);
-      await db2.update("t_inspection", {
+
+      const data = {
         insData: JSON.stringify(insData),
         judgement: null,
-        inspectionStep: JSON.stringify(inspection.inspectionStep),
-      });
+        inspectionStep: JSON.stringify(backToCurrentStep),
+      };
+      console.log("Data to be updated:", data);
+      db2.where("insId", "=", insId);
+      await db2.update("t_inspection", data);
 
       return res.status(200).json({ message: "Rollback successful" });
     } catch (error) {
