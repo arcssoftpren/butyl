@@ -795,7 +795,7 @@ module.exports = {
       await db2.update("t_inspection", {
         insData: JSON.stringify(insData),
         judgement: null,
-        inspectionStep: JSON.stringify(insData.inspectionStep),
+        inspectionStep: JSON.stringify(inspection.inspectionStep),
       });
 
       return res.status(200).json({ message: "Rollback successful" });
