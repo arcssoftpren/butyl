@@ -510,9 +510,7 @@
     <v-divider class="my-2"></v-divider>
     <v-btn
       :color="appearanceValid ? 'success' : 'error'"
-      @click="
-        inspection.currentData.judgement ? appProceed() : initreportNg(true)
-      "
+      @click="appearanceValid ? appProceed() : initreportNg(true)"
       :variant="appearanceValid ? 'outlined' : 'flat'"
       rounded="pill"
       block
